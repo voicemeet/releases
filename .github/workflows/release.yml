@@ -21,9 +21,11 @@ on:
 permissions: read-all
 
 env:
+  flutter-channel: 'stable'
+  flutter-version: '3.32.7'
   repository: 'VoiceMeet/voicemeet'
-  main_path: 'main'
-  source_path: 'voicemeet'
+  main-path: 'main'
+  source-path: 'voicemeet'
 
 jobs:
   create-release:
@@ -39,13 +41,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Set sha
         id: sha_step
@@ -58,7 +60,7 @@ jobs:
 
           echo "sha=$SHA" >> $GITHUB_OUTPUT
           echo "sha_short=$SHA_SHORT" >> $GITHUB_OUTPUT
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Set version
         id: version_step
@@ -89,7 +91,7 @@ jobs:
         env:
           ENV: ${{ github.event.inputs.env }}
           IS_LATEST: ${{ github.event.inputs.latest }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Create a release
         run: |
@@ -99,7 +101,7 @@ jobs:
           SHA: ${{ steps.sha_step.outputs.sha }}
           TAG_NAME: ${{ steps.version_step.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
   gen-shasum:
     name: Gen Shasum
@@ -121,7 +123,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/setup-node@v4
         with:
@@ -143,7 +145,7 @@ jobs:
           SHA: ${{ needs.create-release.outputs.sha }}
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Download assets
         uses: robinraju/release-downloader@v1
@@ -153,9 +155,9 @@ jobs:
           tarBall: false
           zipBall: false
           out-file-path: 'vm-downloads'
-      
+
       - name: Gen SHASUMS256.txt
-        run: shasum create "$GITHUB_WORKSPACE/${{ env.main_path }}/SHASUMS256.txt" *
+        run: shasum create "$GITHUB_WORKSPACE/${{ env.main-path }}/SHASUMS256.txt" *
         working-directory: ${{ github.workspace }}/vm-downloads
 
       - name: Upload assets
@@ -163,7 +165,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
   apk:
     name: Create apk
@@ -173,13 +175,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - uses: actions/setup-java@v4
         with:
@@ -189,8 +191,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -203,11 +205,11 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64 }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64 }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install Deps
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Configure Keystore for Android
         run: |
@@ -221,7 +223,7 @@ jobs:
           KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
-        working-directory: ${{ env.source_path }}/android
+        working-directory: ${{ env.source-path }}/android
 
       # Build the application.
       - name: Build apk
@@ -230,17 +232,17 @@ jobs:
           flutter build apk --dart-define-from-file=.env --no-tree-shake-icons --flavor $FLAVOR
         env:
           ENV: ${{ github.event.inputs.env }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for Android
         run: |
           if [[ "$ENV" == "staging" ]]; then
-            cp app-staging-release.apk $GITHUB_WORKSPACE/${{ env.main_path }}/VoiceMeet-$RELEASE.apk
+            cp app-staging-release.apk $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.apk
           else
-            cp app-production-release.apk $GITHUB_WORKSPACE/${{ env.main_path }}/VoiceMeet-$RELEASE.apk
+            cp app-production-release.apk $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.apk
           fi
-        working-directory: ${{ env.source_path }}/build/app/outputs/flutter-apk
+        working-directory: ${{ env.source-path }}/build/app/outputs/flutter-apk
         env:
           ENV: ${{ github.event.inputs.env }}
           RELEASE: ${{ needs.create-release.outputs.release }}
@@ -250,7 +252,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -258,7 +260,7 @@ jobs:
           rm -f android/app/upload-keystore.jks
           rm -f android/key.properties
           rm -f .env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   aab:
     name: Create appbundle
@@ -268,13 +270,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - uses: actions/setup-java@v4
         with:
@@ -284,8 +286,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -298,11 +300,11 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64 }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64 }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install Deps
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Configure Keystore for Android
         run: |
@@ -316,7 +318,7 @@ jobs:
           KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
-        working-directory: ${{ env.source_path }}/android
+        working-directory: ${{ env.source-path }}/android
 
       # Build the application.
       - name: Build appbundle
@@ -325,20 +327,20 @@ jobs:
           flutter build appbundle --dart-define-from-file=.env --no-tree-shake-icons --flavor $FLAVOR
         env:
           ENV: ${{ github.event.inputs.env }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for Android
         if: github.event.inputs.env == 'staging'
-        run: cp *.aab $GITHUB_WORKSPACE/${{ env.main_path }}/VoiceMeet-$RELEASE.aab
-        working-directory: ${{ env.source_path }}/build/app/outputs/bundle/stagingRelease
+        run: cp *.aab $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.aab
+        working-directory: ${{ env.source-path }}/build/app/outputs/bundle/stagingRelease
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
       - name: Copy build for Android
         if: github.event.inputs.env == 'production'
-        run: cp *.aab $GITHUB_WORKSPACE/${{ env.main_path }}/VoiceMeet-$RELEASE.aab
-        working-directory: ${{ env.source_path }}/build/app/outputs/bundle/productionRelease
+        run: cp *.aab $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.aab
+        working-directory: ${{ env.source-path }}/build/app/outputs/bundle/productionRelease
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
@@ -347,7 +349,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -355,7 +357,7 @@ jobs:
           rm -f android/app/upload-keystore.jks
           rm -f android/key.properties
           rm -f .env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   ios:
     name: Create ios
@@ -365,19 +367,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -390,15 +392,15 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64 }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64 }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving flutter dependencies
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving ios dependencies
         run: pod install --repo-update
-        working-directory: ${{ env.source_path }}/ios
+        working-directory: ${{ env.source-path }}/ios
 
       - name: Install the Apple certificate and provisioning profile
         env:
@@ -439,22 +441,22 @@ jobs:
 
       - name: Remove build cache
         run: xcodebuild clean
-        working-directory: ${{ env.source_path }}/ios
+        working-directory: ${{ env.source-path }}/ios
 
       - name: Build ipa
         if: github.event.inputs.env == 'staging'
         run: flutter build ipa --dart-define-from-file=.env --export-options-plist=ios/ExportOptions/debug.plist
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Build ipa
         if: github.event.inputs.env == 'production'
         run: flutter build ipa --dart-define-from-file=.env --export-options-plist=ios/ExportOptions/release.plist
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for iOS
-        run: cp *.ipa $GITHUB_WORKSPACE/${{ env.main_path }}/VoiceMeet-$RELEASE.ipa
-        working-directory: ${{ env.source_path }}/build/ios/ipa
+        run: cp *.ipa $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.ipa
+        working-directory: ${{ env.source-path }}/build/ios/ipa
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
@@ -463,7 +465,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -474,7 +476,7 @@ jobs:
           fi
           rm -f ~/Library/MobileDevice/Provisioning\ Profiles/voicemeet_*.mobileprovision
           rm -f .env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   macos-dmg:
     name: Create macos dmg
@@ -484,19 +486,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -509,23 +511,23 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64 }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64 }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving flutter dependencies
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving macos dependencies
         run: pod install --repo-update
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Remove build cache
         run: xcodebuild clean
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Build macOS
         run: flutter build macos --dart-define-from-file=.env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install certificates
         env:
@@ -553,7 +555,7 @@ jobs:
 
       - name: Code Signing
         run: /usr/bin/codesign --deep --force -s "$DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY" --options runtime VoiceMeet.app -v
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY }}
 
@@ -576,7 +578,7 @@ jobs:
           # validated by macOS even when an internet connection is not available.
           echo "Attach staple"
           xcrun stapler staple "VoiceMeet.app"
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
@@ -586,17 +588,17 @@ jobs:
       - name: Build DMG
         run: |
           bash scripts/build-dmg.sh
-          mv VoiceMeet.dmg $GITHUB_WORKSPACE/${{ env.main_path }}/VoiceMeet-"$RELEASE"-macos-universal.dmg
+          mv VoiceMeet.dmg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-macos-universal.dmg
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Upload assets
         run: gh release upload "$TAG_NAME" ./*.dmg
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -606,7 +608,7 @@ jobs:
             security delete-keychain $RUNNER_TEMP/kty-signing.keychain-db
           fi
           rm -f .env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   macos-pkg:
     name: Create macos pkg
@@ -616,19 +618,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -641,23 +643,23 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64 }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64 }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving flutter dependencies
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving macos dependencies
         run: pod install --repo-update
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Remove build cache
         run: xcodebuild clean
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Build macOS
         run: flutter build macos --dart-define-from-file=.env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install certificates
         run: |
@@ -692,16 +694,16 @@ jobs:
           bash scripts/codesign-pkg.sh "$DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY"
         env:
           DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Build pkg
         run: |
           # https://www.hexnode.com/mobile-device-management/help/how-to-sign-macos-pkg-files-for-deployment-with-hexnode-mdm/
           xcrun pkgbuild --component "./VoiceMeet.app" --install-location /Applications --sign "$DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY" VoiceMeet-unsigned.pkg
-          mv VoiceMeet-unsigned.pkg "$GITHUB_WORKSPACE/${{ env.source_path }}/VoiceMeet-unsigned.pkg"
+          mv VoiceMeet-unsigned.pkg "$GITHUB_WORKSPACE/${{ env.source-path }}/VoiceMeet-unsigned.pkg"
         env:
           DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY }}
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
 
       - name: Building distribution file
         run: |
@@ -710,7 +712,7 @@ jobs:
           \    <title>VoiceMeet</title>\
           \    <license file="eula.rtf"/>\
           ' distribution.dist
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Sign pkg
         run: |
@@ -718,7 +720,7 @@ jobs:
           xcrun productbuild --distribution distribution.dist --resources macos/packaging/base --sign "$DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY" VoiceMeet.pkg
         env:
           DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Notarize & Staple
         run: |
@@ -738,23 +740,23 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for pkg
         run: |
           test -f VoiceMeet-unsigned.pkg && rm -f VoiceMeet-unsigned.pkg
-          mv VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main_path }}/VoiceMeet-"$RELEASE"-macos-universal.pkg
+          mv VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-macos-universal.pkg
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Upload assets
         run: gh release upload "$TAG_NAME" ./*.pkg
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -764,7 +766,7 @@ jobs:
             security delete-keychain $RUNNER_TEMP/kty-signing.keychain-db
           fi
           rm -f .env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   macos-pkg-appstore:
     name: Create macos pkg (appstore)
@@ -774,19 +776,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -799,23 +801,23 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64 }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64 }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving flutter dependencies
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving macos dependencies
         run: pod install --repo-update
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Remove build cache
         run: xcodebuild clean
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Build macOS
         run: flutter build macos --dart-define-from-file=.env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install certificates
         run: |
@@ -853,7 +855,7 @@ jobs:
           THIRD_PARTY_MAC_DEVELOPER_APPLICATION_PROVISION_PROFILE_BASE64_MAC: ${{ secrets.THIRD_PARTY_MAC_DEVELOPER_APPLICATION_PROVISION_PROFILE_BASE64_MAC }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Code Signing
         run: |
@@ -876,7 +878,7 @@ jobs:
           # /usr/bin/codesign --verify build/macos/Build/Products/Release/VoiceMeet.app
         env:
           THIRD_PARTY_MAC_DEVELOPER_APPLICATION_SIGNING_IDENTITY: ${{ secrets.THIRD_PARTY_MAC_DEVELOPER_APPLICATION_SIGNING_IDENTITY }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Create pkg
         run: |
@@ -888,12 +890,12 @@ jobs:
           xcrun productbuild --sign "$THIRD_PARTY_MAC_DEVELOPER_INSTALLER_SIGNING_IDENTITY" --component VoiceMeet.app /Applications VoiceMeet.pkg
         env:
           THIRD_PARTY_MAC_DEVELOPER_INSTALLER_SIGNING_IDENTITY: ${{ secrets.THIRD_PARTY_MAC_DEVELOPER_INSTALLER_SIGNING_IDENTITY }}
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
 
       # Package the build.
       - name: Copy build for pkg
-        run: cp VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main_path }}/VoiceMeet-"$RELEASE"-macos-appstore-universal.pkg
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        run: cp VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-macos-appstore-universal.pkg
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
@@ -902,7 +904,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -912,7 +914,7 @@ jobs:
             security delete-keychain $RUNNER_TEMP/kty-signing.keychain-db
           fi
           rm -f .env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   macos-zip:
     name: Create macos zip
@@ -922,19 +924,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -947,23 +949,23 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64 }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64 }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving flutter dependencies
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving macos dependencies
         run: pod install --repo-update
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Remove build cache
         run: xcodebuild clean
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Build macOS
         run: flutter build macos --dart-define-from-file=.env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install certificates
         env:
@@ -991,7 +993,7 @@ jobs:
 
       - name: Code Signing
         run: /usr/bin/codesign --deep --force -s "$DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY" --options runtime VoiceMeet.app -v
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY }}
 
@@ -1014,7 +1016,7 @@ jobs:
           # validated by macOS even when an internet connection is not available.
           echo "Attach staple"
           xcrun stapler staple "VoiceMeet.app"
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
@@ -1030,21 +1032,21 @@ jobs:
 
       - name: Build zip
         run: 7z a VoiceMeet-"$RELEASE"-macos-universal.zip ./VoiceMeet.app
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
       # Package the build.
       - name: Copy build for zip
-        run: mv VoiceMeet-*-macos-universal.zip $GITHUB_WORKSPACE/${{ env.main_path }}/
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        run: mv VoiceMeet-*-macos-universal.zip $GITHUB_WORKSPACE/${{ env.main-path }}/
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
 
       - name: Upload assets
         run: gh release upload "$TAG_NAME" ./*.zip
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -1054,7 +1056,7 @@ jobs:
             security delete-keychain $RUNNER_TEMP/kty-signing.keychain-db
           fi
           rm -f .env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   macos-tar:
     name: Create macos tar
@@ -1064,19 +1066,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1089,23 +1091,23 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64 }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64 }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving flutter dependencies
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Resolving macos dependencies
         run: pod install --repo-update
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Remove build cache
         run: xcodebuild clean
-        working-directory: ${{ env.source_path }}/macos
+        working-directory: ${{ env.source-path }}/macos
 
       - name: Build macOS
         run: flutter build macos --dart-define-from-file=.env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install certificates
         env:
@@ -1133,7 +1135,7 @@ jobs:
 
       - name: Code Signing
         run: /usr/bin/codesign --deep --force -s "$DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY" --options runtime VoiceMeet.app -v
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY }}
 
@@ -1156,7 +1158,7 @@ jobs:
           # validated by macOS even when an internet connection is not available.
           echo "Attach staple"
           xcrun stapler staple "VoiceMeet.app"
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
@@ -1165,21 +1167,21 @@ jobs:
 
       - name: Build tar
         run: tar -czaf VoiceMeet-"$RELEASE"-macos-universal.tar.gz ./VoiceMeet.app
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
       # Package the build.
       - name: Copy build for tar
-        run: mv *.tar.gz $GITHUB_WORKSPACE/${{ env.main_path }}/
-        working-directory: ${{ env.source_path }}/build/macos/Build/Products/Release
+        run: mv *.tar.gz $GITHUB_WORKSPACE/${{ env.main-path }}/
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
 
       - name: Upload assets
         run: gh release upload "$TAG_NAME" ./*.tar.gz
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -1189,7 +1191,7 @@ jobs:
             security delete-keychain $RUNNER_TEMP/kty-signing.keychain-db
           fi
           rm -f .env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   windows-exe:
     name: Create windows exe
@@ -1201,19 +1203,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1227,19 +1229,19 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64_WINDOWS }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64_WINDOWS }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: copy eula.rtf to the windows folder
         run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Copy ChineseSimplified.isl to C:\Program Files (x86)\Inno Setup 6\Languages\
         run: copy-item -Path windows\Languages\Unofficial\*.isl -Destination 'C:\Program Files (x86)\Inno Setup 6\Languages\'
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install fastforge
         run: dart pub global activate fastforge
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install yq
         shell: pwsh
@@ -1265,7 +1267,7 @@ jobs:
         env:
           WINDOWS_EXE_APP_ID: ${{ secrets.WINDOWS_EXE_APP_ID }}
           WINDOWS_PUBLISHER_NAME: ${{ secrets.WINDOWS_PUBLISHER_NAME }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Build exe
         shell: pwsh
@@ -1277,7 +1279,7 @@ jobs:
             --artifact-name "{{name}}-$env:RELEASE-{{platform}}-setup-$env:Platform.{{ext}}"
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Signing
         run: |
@@ -1292,12 +1294,12 @@ jobs:
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
           WINDOWS_PUBLISHER_NAME: ${{ secrets.WINDOWS_PUBLISHER_NAME }}
-        working-directory: ${{ env.source_path }}\dist
+        working-directory: ${{ env.source-path }}\dist
 
       # Package the build.
       - name: Copy build for exe
-        run: cp .\**\*.exe "$env:GITHUB_WORKSPACE\${{ env.main_path }}\"
-        working-directory: ${{ env.source_path }}\dist
+        run: cp .\**\*.exe "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+        working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
         run: |
@@ -1306,7 +1308,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -1324,7 +1326,7 @@ jobs:
           } else {
             echo "File($pwd\.env) doesn't exist."
           }
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   windows-msi:
     name: Create windows msi
@@ -1337,19 +1339,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1375,11 +1377,11 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64_WINDOWS }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64_WINDOWS }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: copy eula.rtf to the windows folder
         run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install yq
         shell: pwsh
@@ -1389,11 +1391,11 @@ jobs:
 
       - name: Install flutter dependencies
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Build windows
         run: flutter build windows --dart-define-from-file=.env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
@@ -1425,7 +1427,7 @@ jobs:
           WINDOWS_PUBLISHER_NAME: ${{ secrets.WINDOWS_PUBLISHER_NAME }}
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for msi
@@ -1433,10 +1435,10 @@ jobs:
         run: |
           Rename-Item -Path "$pwd\msi\voicemeet\bin\$env:Platform\$env:Configuration\en-us\voicemeet.msi" -NewName "voicemeet-$env:RELEASE-windows-$env:Platform-en-US.msi"
           Rename-Item -Path "$pwd\msi\voicemeet\bin\$env:Platform\$env:Configuration\zh-cn\voicemeet.msi" -NewName "voicemeet-$env:RELEASE-windows-$env:Platform-zh-CN.msi"
-          cp ".\msi\voicemeet\bin\$env:Platform\$env:Configuration\*\*.msi" "$env:GITHUB_WORKSPACE\${{ env.main_path }}\"
+          cp ".\msi\voicemeet\bin\$env:Platform\$env:Configuration\*\*.msi" "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Upload assets
         run: |
@@ -1445,7 +1447,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -1462,7 +1464,7 @@ jobs:
           } else {
             echo "File($pwd\.env) doesn't exist."
           }
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   windows-msix:
     name: Create windows msix
@@ -1474,19 +1476,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1500,11 +1502,11 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64_WINDOWS }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64_WINDOWS }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: copy eula.rtf to the windows folder
         run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install yq
         shell: pwsh
@@ -1541,26 +1543,26 @@ jobs:
           WINDOWS_IDENTITY_NAME: ${{ secrets.WINDOWS_IDENTITY_NAME }}
           WINDOWS_PUBLISHER: ${{ secrets.WINDOWS_PUBLISHER }}
           WINDOWS_PUBLISHER_NAME: ${{ secrets.WINDOWS_PUBLISHER_NAME }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install flutter dependencies
         run: flutter pub get
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Build windows
         run: flutter build windows --dart-define-from-file=.env
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Create msix
         run: dart run msix:create --store --build-windows false --output-name "voicemeet-$env:RELEASE-windows-store-$env:Platform"
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for msix
-        run: cp .\*.msix "$env:GITHUB_WORKSPACE\${{ env.main_path }}\"
-        working-directory: ${{ env.source_path }}\build\windows\${{ env.Platform }}\runner\Release
+        run: cp .\*.msix "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+        working-directory: ${{ env.source-path }}\build\windows\${{ env.Platform }}\runner\Release
 
       - name: Upload assets
         run: |
@@ -1569,7 +1571,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -1594,7 +1596,7 @@ jobs:
           } else {
             echo "File($pwd\.env) doesn't exist."
           }
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
   windows-zip:
     name: Create windows zip
@@ -1606,19 +1608,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ${{ env.main_path }}
+          path: ${{ env.main-path }}
 
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
-          path: ${{ env.source_path }}
+          path: ${{ env.source-path }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.7'
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1632,15 +1634,15 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64_WINDOWS }}
           ENV_PROD_BASE64: ${{ secrets.ENV_PROD_BASE64_WINDOWS }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: copy eula.rtf to the windows folder
         run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Install fastforge
         run: dart pub global activate fastforge
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       - name: Build zip
         shell: pwsh
@@ -1652,12 +1654,12 @@ jobs:
             --artifact-name "{{name}}-$env:RELEASE-{{platform}}-portable-$env:Platform.{{ext}}"
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for zip
-        run: cp .\**\*.zip "$env:GITHUB_WORKSPACE\${{ env.main_path }}\"
-        working-directory: ${{ env.source_path }}\dist
+        run: cp .\**\*.zip "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+        working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
         run: |
@@ -1666,7 +1668,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main_path }}
+        working-directory: ${{ env.main-path }}
 
       - name: Clean up
         if: ${{ always() }}
@@ -1677,4 +1679,4 @@ jobs:
           } else {
             echo "File($pwd\.env) doesn't exist."
           }
-        working-directory: ${{ env.source_path }}
+        working-directory: ${{ env.source-path }}
