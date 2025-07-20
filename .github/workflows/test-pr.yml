@@ -1,0 +1,212 @@
+name: Test (PR)
+
+on:
+  repository_dispatch:
+    types: [ code-pull_request ]
+
+# Declare default permissions as readonly.
+permissions: read-all
+
+env:
+  flutter-channel: 'stable'
+  flutter-version: '3.32.7'
+  repository: 'VoiceMeet/voicemeet'
+  main-path: 'main'
+  source-path: 'voicemeet'
+
+jobs:
+  apk:
+    name: Create apk
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "17.x"
+          distribution: 'temurin'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Install Deps
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Build Apk
+        run: flutter build apk --debug --no-tree-shake-icons --flavor staging
+        working-directory: ${{ env.source-path }}
+
+  ios:
+    name: Create ios
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Resolving flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Resolving ios dependencies
+        run: pod install --repo-update
+        working-directory: ${{ env.source-path }}/ios
+
+      - name: Remove build cache
+        run: xcodebuild clean
+        working-directory: ${{ env.source-path }}/ios
+
+      - name: Build Ipa
+        run: flutter build ipa --no-codesign
+        working-directory: ${{ env.source-path }}
+
+  macos:
+    name: Create macos
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Resolving flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Resolving macos dependencies
+        run: pod install --repo-update
+        working-directory: ${{ env.source-path }}/macos
+
+      - name: Remove build cache
+        run: xcodebuild clean
+        working-directory: ${{ env.source-path }}/macos
+
+      - name: Build macOS
+        run: flutter build macos
+        working-directory: ${{ env.source-path }}
+
+  windows:
+    name: Create windows
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: copy eula.rtf to the windows folder
+        run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
+        working-directory: ${{ env.source-path }}
+
+      - name: Install fastforge
+        run: dart pub global activate fastforge
+        working-directory: ${{ env.source-path }}
+
+      - name: Install flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Build flutter
+        run: flutter build windows
+        working-directory: ${{ env.source-path }}
+
+  web:
+    name: Create web
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Install dependencies for Linux
+        run: |
+          # https://github.com/getsentry/sentry-dart/issues/2504
+          sudo apt-get update -y && sudo apt-get upgrade -y
+          sudo apt-get install -y curl libcurl4-openssl-dev git unzip xz-utils zip libglu1-mesa
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Install flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Build flutter
+        run: flutter build web
+        working-directory: ${{ env.source-path }}

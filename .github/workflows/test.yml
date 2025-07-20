@@ -1,0 +1,425 @@
+name: Test
+
+on:
+  repository_dispatch:
+    types: [ code-push ]
+
+# Declare default permissions as readonly.
+permissions: read-all
+
+env:
+  flutter-channel: 'stable'
+  flutter-version: '3.32.7'
+  repository: 'VoiceMeet/voicemeet'
+  main-path: 'main'
+  source-path: 'voicemeet'
+
+jobs:
+  apk:
+    name: Create apk
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "17.x"
+          distribution: 'temurin'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Configure .env
+        run: echo "$ENV_KEY" | base64 --decode > .env
+        env:
+          ENV_KEY: ${{ secrets.ENV_STG_BASE64 }}
+        working-directory: ${{ env.source-path }}
+
+      - name: Install Deps
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Configure Keystore for Android
+        run: |
+          echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/upload-keystore.jks
+          echo "storeFile=upload-keystore.jks" >> key.properties
+          echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> key.properties
+          echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> key.properties
+          echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> key.properties
+        env:
+          PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+        working-directory: ${{ env.source-path }}/android
+
+      - name: Build Apk
+        run: flutter build apk --no-tree-shake-icons --dart-define-from-file=.env --flavor staging
+        working-directory: ${{ env.source-path }}
+
+      # Package the build.
+      - name: Copy build for Android
+        run: ls -la
+        working-directory: ${{ env.source-path }}/build/app/outputs/apk/staging/release
+
+      - name: Clean up
+        if: ${{ always() }}
+        run: |
+          rm -f android/app/upload-keystore.jks
+          rm -f android/key.properties
+          rm -f .env
+        working-directory: ${{ env.source-path }}
+
+  ios:
+    name: Create ios
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Configure .env
+        run: echo "$ENV_KEY" | base64 --decode > .env
+        env:
+          ENV_KEY: ${{ secrets.ENV_STG_BASE64 }}
+        working-directory: ${{ env.source-path }}
+
+      - name: Resolving flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Resolving ios dependencies
+        run: pod install --repo-update
+        working-directory: ${{ env.source-path }}/ios
+
+      - name: Install the Apple certificate and provisioning profile
+        env:
+          P12_DEV_BASE64: ${{ secrets.P12_DEV_BASE64 }}
+          P12_BASE64: ${{ secrets.P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          PROVISION_PROFILE_DEV_BASE64: ${{ secrets.PROVISION_PROFILE_DEV_BASE64 }}
+          PROVISION_PROFILE_BASE64: ${{ secrets.PROVISION_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # create variables
+          CERTIFICATE_DEV_PATH=$RUNNER_TEMP/build_certificate_dev.p12
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          PP_DEV_PATH=$RUNNER_TEMP/voicemeet_dev.mobileprovision
+          PP_PATH=$RUNNER_TEMP/voicemeet_appstore.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/kty-signing.keychain-db
+
+          # import certificate and provisioning profile from secrets
+          echo -n "$P12_DEV_BASE64" | base64 --decode --output $CERTIFICATE_DEV_PATH
+          echo -n "$P12_BASE64" | base64 --decode --output $CERTIFICATE_PATH
+          echo -n "$PROVISION_PROFILE_DEV_BASE64" | base64 --decode --output $PP_DEV_PATH
+          echo -n "$PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_PATH
+
+          # create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # import certificate to keychain
+          security import $CERTIFICATE_DEV_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+          # apply provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          mv $PP_DEV_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+          mv $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+
+      - name: Remove build cache
+        run: xcodebuild clean
+        working-directory: ${{ env.source-path }}/ios
+
+      - name: Build Ipa
+        run: flutter build ipa --dart-define-from-file=.env --export-options-plist=ios/ExportOptions/debug.plist
+        working-directory: ${{ env.source-path }}
+
+      # Package the build.
+      - name: Copy build for iOS
+        run: ls -la
+        working-directory: ${{ env.source-path }}/build/ios/ipa
+
+      - name: Clean up
+        if: ${{ always() }}
+        run: |
+          if [ -f "$RUNNER_TEMP/kty-signing.keychain-db" ]; then
+            echo "$RUNNER_TEMP/kty-signing.keychain-db"
+            security delete-keychain $RUNNER_TEMP/kty-signing.keychain-db
+          fi
+          rm -f ~/Library/MobileDevice/Provisioning\ Profiles/voicemeet_*.mobileprovision
+          rm -f .env
+        working-directory: ${{ env.source-path }}
+
+  macos:
+    name: Create macos
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Configure .env
+        run: echo "$ENV_KEY" | base64 --decode > .env
+        env:
+          ENV_KEY: ${{ secrets.ENV_STG_BASE64 }}
+        working-directory: ${{ env.source-path }}
+
+      - name: Resolving flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Resolving macos dependencies
+        run: pod install --repo-update
+        working-directory: ${{ env.source-path }}/macos
+
+      - name: Remove build cache
+        run: xcodebuild clean
+        working-directory: ${{ env.source-path }}/macos
+
+      - name: Build macOS
+        run: flutter build macos --dart-define-from-file=.env
+        working-directory: ${{ env.source-path }}
+
+      - name: Install certificates
+        env:
+          DEVELOPER_ID_APPLICATION_P12_BASE64_MAC: ${{ secrets.DEVELOPER_ID_APPLICATION_P12_BASE64_MAC }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # create variables
+          DEVELOPER_ID_APPLICATION_CERTIFICATE_PATH=$RUNNER_TEMP/build_developerID_application_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/kty-signing.keychain-db
+
+          # import certificate and provisioning profile from secrets
+          echo -n "$DEVELOPER_ID_APPLICATION_P12_BASE64_MAC" | base64 --decode --output $DEVELOPER_ID_APPLICATION_CERTIFICATE_PATH
+
+          # create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          # security default-keychain -s $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # import certificate to keychain
+          security import $DEVELOPER_ID_APPLICATION_CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+      - name: Code Signing
+        run: /usr/bin/codesign --deep --force -s "$DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY" --options runtime VoiceMeet.app -v
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
+        env:
+          DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_APPLICATION_SIGNING_IDENTITY }}
+
+      - name: Notarize app
+        run: |
+          # We can't notarize an app bundle directly, but we need to compress it as an archive.
+          # Therefore, we create a zip file containing our app bundle, so that we can send it to the
+          # notarization service
+          echo "Creating temp notarization archive"
+          ditto -c -k --keepParent "VoiceMeet.app" "VoiceMeet.zip"
+
+          # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
+          # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
+          # characteristics. Visit the Notarization docs for more information and strategies on how to optimize it if
+          # you're curious
+          echo "Notarize app"
+          xcrun notarytool submit "VoiceMeet.zip" --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_PASSWORD" --wait
+
+          # Finally, we need to "attach the staple" to our executable, which will allow our app to be
+          # validated by macOS even when an internet connection is not available.
+          echo "Attach staple"
+          xcrun stapler staple "VoiceMeet.app"
+        working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+
+      - name: Build DMG
+        run: bash scripts/build-dmg.sh
+        working-directory: ${{ env.source-path }}
+
+      # Package the build.
+      - name: Copy build for snap
+        run: ls -la *.dmg
+        working-directory: ${{ env.source-path }}
+
+      - name: Clean up
+        if: ${{ always() }}
+        run: |
+          if [ -f "$RUNNER_TEMP/kty-signing.keychain-db" ]; then
+            echo "$RUNNER_TEMP/kty-signing.keychain-db"
+            security delete-keychain $RUNNER_TEMP/kty-signing.keychain-db
+          fi
+          rm -f .env
+        working-directory: ${{ env.source-path }}
+
+  windows:
+    name: Create windows
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Configure .env
+        run: |
+          $bytes = echo $env:ENV_KEY | %{[Convert]::FromBase64String($_)}
+          [IO.File]::WriteAllBytes("$pwd\.env", $bytes)
+        env:
+          ENV_KEY: ${{ secrets.ENV_STG_BASE64_WINDOWS }}
+        working-directory: ${{ env.source-path }}
+
+      - name: copy eula.rtf to the windows folder
+        run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
+        working-directory: ${{ env.source-path }}
+
+      - name: Install fastforge
+        run: dart pub global activate fastforge
+        working-directory: ${{ env.source-path }}
+
+      - name: Install flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Build zip
+        run: |
+          fastforge package `
+            --flutter-build-args "dart-define-from-file=.env" `
+            --platform windows `
+            --targets zip `
+            --artifact-name '{{name}}-{{build_name}}.{{build_number}}.{{ext}}'
+        working-directory: ${{ env.source-path }}
+
+      # Package the build.
+      - name: Copy build for zip
+        run: ls -R
+        working-directory: ${{ env.source-path }}\dist
+
+      - name: Clean up
+        if: ${{ always() }}
+        run: |
+          if (test-path -Path "$pwd\.env") {
+            echo "Remove file($pwd\.env)"
+            remove-item -Path "$pwd\.env" -Force -ErrorAction SilentlyContinue
+          } else {
+            echo "File($pwd\.env) doesn't exist."
+          }
+        working-directory: ${{ env.source-path }}
+
+  web:
+    name: Create web
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Install dependencies for Linux
+        run: |
+          # https://github.com/getsentry/sentry-dart/issues/2504
+          sudo apt-get update -y && sudo apt-get upgrade -y
+          sudo apt-get install -y curl libcurl4-openssl-dev git unzip xz-utils zip libglu1-mesa
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Configure .env
+        run: echo "$ENV_KEY" | base64 --decode > .env
+        env:
+          ENV_KEY: ${{ secrets.ENV_STG_BASE64 }}
+        working-directory: ${{ env.source-path }}
+
+      - name: Install flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Build flutter
+        run: flutter build web --dart-define-from-file=.env
+        working-directory: ${{ env.source-path }}
+
+      - name: Clean up
+        if: ${{ always() }}
+        run: rm -f .env
+        working-directory: ${{ env.source-path }}
