@@ -125,13 +125,6 @@ jobs:
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install @insco/shasum
-        run: npm install -g @insco/shasum
-
       - name: Publish a release
         run: |
           if [[ "$ENV" == "production" && "$IS_LATEST" == "true" ]]; then
@@ -143,26 +136,6 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           IS_LATEST: ${{ github.event.inputs.latest }}
           SHA: ${{ needs.create-release.outputs.sha }}
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
-        working-directory: ${{ env.main-path }}
-
-      - name: Download assets
-        uses: robinraju/release-downloader@v1
-        with:
-          tag: "${{ needs.create-release.outputs.tag_name }}"
-          fileName: '*'
-          tarBall: false
-          zipBall: false
-          out-file-path: 'vm-downloads'
-
-      - name: Gen SHASUMS256.txt
-        run: shasum create "$GITHUB_WORKSPACE/${{ env.main-path }}/SHASUMS256.txt" *
-        working-directory: ${{ github.workspace }}/vm-downloads
-
-      - name: Upload assets
-        run: gh release upload "$TAG_NAME" ./SHASUMS256.txt
-        env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
         working-directory: ${{ env.main-path }}
