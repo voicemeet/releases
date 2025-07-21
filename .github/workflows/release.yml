@@ -3,6 +3,11 @@ on:
   # Enable manual run
   workflow_dispatch:
     inputs:
+      ref:
+        type: string
+        description: "The branch, tag or SHA to checkout. (default to main)"
+        default: "main"
+        required: false
       env:
         type: choice
         description: "Which environment are you using?"
@@ -46,6 +51,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -153,6 +159,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -248,6 +255,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -345,6 +353,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -464,6 +473,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -596,6 +606,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -754,6 +765,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -902,6 +914,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -1044,6 +1057,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -1181,6 +1195,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -1317,6 +1332,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -1454,6 +1470,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
@@ -1586,6 +1603,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
