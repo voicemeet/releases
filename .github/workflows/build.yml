@@ -1,7 +1,7 @@
-name: Nightly Release
+name: Weekly Build
 on:
   schedule:
-    - cron: '0 1 * * *' # 1:00:00 AM UTC => 9:00:00 AM CST
+    - cron: '0 1 * * 6' # At 01:00 AM, only on Saturday, UTC
   # Enable manual run
   workflow_dispatch:
 
@@ -55,11 +55,10 @@ jobs:
           BUILD_NUMBER=$(date '+%Y%m%d')
           echo "BUILD_NUMBER: $BUILD_NUMBER."
           
-          SUFFIX=nightly
-          
           NIGHTLY_DATE=$(date '+%Y.%m.%d')
           echo "NIGHTLY_DATE: $NIGHTLY_DATE"
           
+          SUFFIX=weekly
           FULL_VERSION="$VERSION-0.$SUFFIX.$NIGHTLY_DATE"
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -70,8 +69,8 @@ jobs:
 
       - name: Create a release
         run: |
-          RELEASE_NOTES="Release created by [VoiceMeet](https://github.com/${{ env.repository }}) workflow run [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }})<br/><br/>Please refer to [CHANGELOG.md](https://github.com/${{ env.repository }}/blob/main/CHANGELOG.md) for details."
-          gh release create "$TAG_NAME" --draft --latest=false --prerelease=false --target "$SHA" --title "Nightly build ${{ env.nightly_date }}" --notes "$RELEASE_NOTES"
+          RELEASE_NOTES="Release created by [VoiceMeet](https://github.com/${{ github.repository }}) workflow run [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }})<br/><br/>Please refer to [CHANGELOG.md](https://voicemeet.io/changelog) for details."
+          gh release create "$TAG_NAME" --draft --latest=false --prerelease=false --target "$SHA" --title "Weekly build ${{ env.nightly_date }}" --notes "$RELEASE_NOTES"
         env:
           SHA: ${{ steps.sha_step.outputs.sha }}
           TAG_NAME: ${{ steps.version_step.outputs.tag_name }}
@@ -79,8 +78,8 @@ jobs:
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
         working-directory: ${{ env.main-path }}
 
-  gen-shasum:
-    name: Gen Shasum
+  publish:
+    name: Publish
     runs-on: ubuntu-22.04
     needs:
       - create-release
