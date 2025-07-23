@@ -109,8 +109,8 @@ jobs:
           GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
         working-directory: ${{ env.main-path }}
 
-  gen-shasum:
-    name: Gen Shasum
+  publish:
+    name: Publish
     runs-on: ubuntu-22.04
     needs:
       - create-release
