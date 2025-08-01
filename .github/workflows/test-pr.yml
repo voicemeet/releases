@@ -13,8 +13,8 @@ env:
   source-path: 'voicemeet'
 
 jobs:
-  create-release:
-    name: Create release
+  get-flutter-version:
+    name: Get flutter version
     runs-on: ubuntu-22.04
     outputs:
       flutter_channel: ${{ steps.flutter_version_step.outputs.flutter_channel }}
@@ -46,7 +46,7 @@ jobs:
     name: Create apk
     runs-on: ubuntu-22.04
     needs:
-      - create-release
+      - get-flutter-version
     steps:
       - uses: actions/checkout@v4
         with:
@@ -67,8 +67,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ needs.create-release.outputs.flutter_channel }}
-          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
+          channel: ${{ needs.get-flutter-version.outputs.flutter_channel }}
+          flutter-version: ${{ needs.get-flutter-version.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -85,7 +85,7 @@ jobs:
     name: Create ios
     runs-on: macos-15
     needs:
-      - create-release
+      - get-flutter-version
     steps:
       - uses: actions/checkout@v4
         with:
@@ -101,8 +101,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ needs.create-release.outputs.flutter_channel }}
-          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
+          channel: ${{ needs.get-flutter-version.outputs.flutter_channel }}
+          flutter-version: ${{ needs.get-flutter-version.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -127,7 +127,7 @@ jobs:
     name: Create macos
     runs-on: macos-15
     needs:
-      - create-release
+      - get-flutter-version
     steps:
       - uses: actions/checkout@v4
         with:
@@ -143,8 +143,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ needs.create-release.outputs.flutter_channel }}
-          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
+          channel: ${{ needs.get-flutter-version.outputs.flutter_channel }}
+          flutter-version: ${{ needs.get-flutter-version.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -169,7 +169,7 @@ jobs:
     name: Create windows
     runs-on: windows-2022
     needs:
-      - create-release
+      - get-flutter-version
     steps:
       - uses: actions/checkout@v4
         with:
@@ -185,8 +185,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ needs.create-release.outputs.flutter_channel }}
-          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
+          channel: ${{ needs.get-flutter-version.outputs.flutter_channel }}
+          flutter-version: ${{ needs.get-flutter-version.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -211,7 +211,7 @@ jobs:
     name: Create web
     runs-on: ubuntu-22.04
     needs:
-      - create-release
+      - get-flutter-version
     steps:
       - uses: actions/checkout@v4
         with:
@@ -234,8 +234,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ needs.create-release.outputs.flutter_channel }}
-          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
+          channel: ${{ needs.get-flutter-version.outputs.flutter_channel }}
+          flutter-version: ${{ needs.get-flutter-version.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
