@@ -26,8 +26,6 @@ on:
 permissions: read-all
 
 env:
-  flutter-channel: 'stable'
-  flutter-version: '3.32.7'
   repository: 'VoiceMeet/voicemeet'
   main-path: 'main'
   source-path: 'voicemeet'
@@ -37,6 +35,8 @@ jobs:
     name: Create release
     runs-on: ubuntu-22.04
     outputs:
+      flutter_channel: ${{ steps.flutter_version_step.outputs.flutter_channel }}
+      flutter_version: ${{ steps.flutter_version_step.outputs.flutter_version }}
       sha: ${{ steps.sha_step.outputs.sha }}
       version: ${{ steps.version_step.outputs.version }}
       version_short: ${{ steps.version_step.outputs.version_short }}
@@ -55,17 +55,24 @@ jobs:
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
+      - name: Set flutter version
+        id: flutter_version_step
+        run: |
+          flutter_channel=$(sed -n -E "s/.*flutter-channel:\ '(.*)'/\1/p" .github/workflows/release.yml|head -n1)
+          flutter_version=$(sed -n -E "s/.*flutter-version:\ '(.*)'/\1/p" .github/workflows/release.yml|head -n1)
+          echo "flutter_channel: $flutter_channel, flutter_version: $flutter_version."
+
+          echo "flutter_channel=$flutter_channel" >> $GITHUB_OUTPUT
+          echo "flutter_version=$flutter_version" >> $GITHUB_OUTPUT
+        working-directory: ${{ env.source-path }}
+
       - name: Set sha
         id: sha_step
         run: |
           SHA=$(git rev-parse HEAD)
           echo "SHA: $SHA."
 
-          SHA_SHORT=$(git rev-parse --short=8 HEAD)
-          echo "SHA_SHORT: $SHA_SHORT."
-
           echo "sha=$SHA" >> $GITHUB_OUTPUT
-          echo "sha_short=$SHA_SHORT" >> $GITHUB_OUTPUT
         working-directory: ${{ env.main-path }}
 
       - name: Set version
@@ -171,8 +178,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -267,8 +274,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -360,8 +367,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -480,8 +487,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -613,8 +620,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -772,8 +779,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -921,8 +928,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1064,8 +1071,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1202,8 +1209,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1339,8 +1346,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1477,8 +1484,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -1610,8 +1617,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
-          flutter-version: ${{ env.flutter-version }}
+          channel: ${{ needs.create-release.outputs.flutter_channel }}
+          flutter-version: ${{ needs.create-release.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
