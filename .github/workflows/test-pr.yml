@@ -204,7 +204,9 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build flutter
-        run: flutter build windows
+        run: |
+          $env:SENTRY_NATIVE_BACKEND = "breakpad"
+          flutter build windows
         working-directory: ${{ env.source-path }}
 
   web:

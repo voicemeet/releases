@@ -1195,6 +1195,7 @@ jobs:
       - name: Build exe
         shell: pwsh
         run: |
+          $env:SENTRY_NATIVE_BACKEND = "breakpad"
           fastforge package `
             --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
             --platform windows `
@@ -1318,7 +1319,9 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build windows
-        run: flutter build windows --dart-define-from-file=.env --build-name=$env:VERSION --build-number $env:BUILD_NUMBER
+        run: |
+          $env:SENTRY_NATIVE_BACKEND = "breakpad"
+          flutter build windows --dart-define-from-file=.env --build-name=$env:VERSION --build-number $env:BUILD_NUMBER
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -1476,7 +1479,9 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build windows
-        run: flutter build windows --dart-define-from-file=.env --build-name=$env:VERSION --build-number $env:BUILD_NUMBER
+        run: |
+          $env:SENTRY_NATIVE_BACKEND = "breakpad"
+          flutter build windows --dart-define-from-file=.env --build-name=$env:VERSION --build-number $env:BUILD_NUMBER
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -1573,6 +1578,7 @@ jobs:
       - name: Build zip
         shell: pwsh
         run: |
+          $env:SENTRY_NATIVE_BACKEND = "breakpad"
           fastforge package `
             --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
             --platform windows `
