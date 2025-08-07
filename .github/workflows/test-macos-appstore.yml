@@ -1,4 +1,4 @@
-name: Test macOS pkg (appstore)
+name: Test macOS appstore
 
 on:
   workflow_dispatch:
@@ -18,8 +18,8 @@ env:
   source-path: 'voicemeet'
 
 jobs:
-  macos-pkg-appstore:
-    name: Create pkg appstore
+  macos-appstore:
+    name: Create macos appstore
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
