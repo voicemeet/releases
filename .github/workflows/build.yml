@@ -79,7 +79,7 @@ jobs:
           echo "NIGHTLY_DATE: $NIGHTLY_DATE"
           
           SUFFIX=weekly
-          FULL_VERSION="$VERSION-0.$SUFFIX.$NIGHTLY_DATE"
+          FULL_VERSION="$VERSION.$SUFFIX.$NIGHTLY_DATE"
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
