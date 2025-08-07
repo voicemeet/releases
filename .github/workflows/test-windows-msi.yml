@@ -1,0 +1,186 @@
+name: Test Windows msi
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        description: "The branch, tag or SHA to checkout. (default to main)"
+        default: "main"
+        required: false
+
+# Declare default permissions as readonly.
+permissions: read-all
+
+env:
+  repository: 'VoiceMeet/voicemeet'
+  main-path: 'main'
+  source-path: 'voicemeet'
+
+jobs:
+  get-version:
+    name: Create release
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.version_step.outputs.version }}
+      version_short: ${{ steps.version_step.outputs.version_short }}
+      build_number: ${{ steps.version_step.outputs.build_number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Set version
+        id: version_step
+        run: |
+          VERSION=$(yq '.version' pubspec.yaml)
+          echo "VERSION: $VERSION."
+
+          VERSION_SHORT=$(echo "$VERSION" | sed -e "s/+.*//")
+          echo "VERSION_SHORT: $VERSION_SHORT."
+
+          BUILD_NUMBER=$(echo "$VERSION" | sed -e "s/.*+//")
+          echo "BUILD_NUMBER: $BUILD_NUMBER."
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_short=$VERSION_SHORT" >> $GITHUB_OUTPUT
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+        working-directory: ${{ env.source-path }}
+
+  windows-msi:
+    name: Create msi
+    runs-on: windows-2022
+    env:
+      Platform: x64
+      Configuration: Release
+    needs:
+      - get-version
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.32.8'
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Install yq
+        shell: pwsh
+        run: |
+          choco install yq
+          yq --version
+
+      - name: Install wix toolset
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 4.0.5
+          wix --version
+
+      - name: Configure .env
+        run: |
+          echo "$pwd"
+          $bytes = echo $env:ENV_KEY | %{[Convert]::FromBase64String($_)}
+          [IO.File]::WriteAllBytes("$pwd\.env", $bytes)
+        env:
+          ENV_KEY: ${{ secrets.ENV_STG_BASE64_WINDOWS }}
+        working-directory: ${{ env.source-path }}
+
+      - name: copy eula.rtf to the windows folder
+        run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
+        working-directory: ${{ env.source-path }}
+
+      - name: Install flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Build windows
+        run: |
+          $env:SENTRY_NATIVE_BACKEND = "breakpad"
+          flutter build windows --dart-define-from-file=.env
+        working-directory: ${{ env.source-path }}
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Create msi
+        shell: pwsh
+        run: |
+          echo $env:RUNNER_TEMP
+          $certificatePath = "$env:RUNNER_TEMP\voicemeet.pfx"
+          # https://stackoverflow.com/questions/15414678/how-to-decode-a-base64-string
+          # https://stackoverflow.com/questions/66239147/pfx-encoded-and-back-to-pfx-in-powershell
+          $bytes = echo $env:WINDOWS_CERTIFICATE | %{[Convert]::FromBase64String($_)}
+          [IO.File]::WriteAllBytes("$certificatePath", $bytes)
+
+          $env:IconPath = "$pwd\windows\runner\resources\app_icon.ico"
+          $env:FLUTTER_BUILD_OUTPUT_DIR = "$pwd\build\windows\$env:Platform\runner\Release"
+          $env:LicensePath = "$env:FLUTTER_BUILD_OUTPUT_DIR\LICENSE.rtf"
+          
+          pushd ./msi
+          
+          python preprocess.py --arp -d ../build/windows/$env:Platform/runner/Release -i ../windows/runner/resources/app_icon.ico -v "$env:VERSION_SHORT.$env:BUILD_NUMBER"
+          nuget restore voicemeet.sln
+          msbuild voicemeet.sln -p:Configuration="$env:Configuration" -p:Platform="$env:Platform" /p:TargetVersion=Windows10
+
+          $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
+          & $signtool sign /v /f "$certificatePath" /fd SHA256 /t http://timestamp.comodoca.com/authenticode /p "$env:WINDOWS_CERTIFICATE_PASSWORD" /n "$env:WINDOWS_PUBLISHER_NAME" (get-item ".\voicemeet\bin\$env:Platform\$env:Configuration\*\*.msi")
+        env:
+          VERSION_SHORT: ${{ needs.get-version.outputs.version_short }}
+          BUILD_NUMBER: ${{ needs.get-version.outputs.build_number }}
+          WINDOWS_PUBLISHER_NAME: ${{ secrets.WINDOWS_PUBLISHER_NAME }}
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        working-directory: ${{ env.source-path }}
+
+      # Package the build.
+      - name: Copy build for msi
+        shell: pwsh
+        run: |
+          Rename-Item -Path "$pwd\msi\voicemeet\bin\$env:Platform\$env:Configuration\en-us\voicemeet.msi" -NewName "voicemeet-$env:VERSION_SHORT.$env:BUILD_NUMBER-windows-$env:Platform-en-US.msi"
+          Rename-Item -Path "$pwd\msi\voicemeet\bin\$env:Platform\$env:Configuration\zh-cn\voicemeet.msi" -NewName "voicemeet-$env:VERSION_SHORT.$env:BUILD_NUMBER-windows-$env:Platform-zh-CN.msi"
+        env:
+          VERSION_SHORT: ${{ needs.get-version.outputs.version_short }}
+          BUILD_NUMBER: ${{ needs.get-version.outputs.build_number }}
+        working-directory: ${{ env.source-path }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-msi-artifact
+          path: .\${{ env.source-path }}\msi\voicemeet\bin\${{ env.Platform }}\${{ env.Configuration }}\*\*.msi
+
+      - name: Clean up
+        if: ${{ always() }}
+        run: |
+          ls
+          if (test-path -Path "$env:RUNNER_TEMP\voicemeet.pfx") {
+            echo "$env:RUNNER_TEMP\voicemeet.pfx"
+            remove-item -Path "$env:RUNNER_TEMP\voicemeet.pfx" -Force -ErrorAction SilentlyContinue
+          } else {
+            echo "File($env:RUNNER_TEMP\voicemeet.pfx) doesn't exist."
+          }
+          if (test-path -Path "$pwd\.env") {
+            echo "Remove file($pwd\.env)"
+            remove-item -Path "$pwd\.env" -Force -ErrorAction SilentlyContinue
+          } else {
+            echo "File($pwd\.env) doesn't exist."
+          }
+        working-directory: ${{ env.source-path }}

@@ -1,0 +1,94 @@
+name: Test Windows zip
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        description: "The branch, tag or SHA to checkout. (default to main)"
+        default: "main"
+        required: false
+
+# Declare default permissions as readonly.
+permissions: read-all
+
+env:
+  repository: 'VoiceMeet/voicemeet'
+  main-path: 'main'
+  source-path: 'voicemeet'
+
+jobs:
+  windows-zip:
+    name: Create zip
+    runs-on: windows-2022
+    env:
+      Platform: x64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.32.8'
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Configure .env
+        run: |
+          echo "$pwd"
+          $bytes = echo $env:ENV_KEY | %{[Convert]::FromBase64String($_)}
+          [IO.File]::WriteAllBytes("$pwd\.env", $bytes)
+        env:
+          ENV_KEY: ${{ secrets.ENV_STG_BASE64_WINDOWS }}
+        working-directory: ${{ env.source-path }}
+
+      - name: copy eula.rtf to the windows folder
+        run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
+        working-directory: ${{ env.source-path }}
+
+      - name: Install fastforge
+        run: dart pub global activate fastforge
+
+      - name: Build zip
+        shell: pwsh
+        run: |
+          $env:SENTRY_NATIVE_BACKEND = "breakpad"
+          fastforge package `
+            --flutter-build-args "dart-define-from-file=.env" `
+            --platform windows `
+            --targets zip `
+            --artifact-name "{{name}}-{{build_name}}.{{build_number}}-{{platform}}-portable-$env:Platform.{{ext}}"
+        working-directory: ${{ env.source-path }}
+
+      # Package the build.
+      - name: Copy build for zip
+        run: ls -R
+        working-directory: ${{ env.source-path }}\dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-zip-artifact
+          path: .\${{ env.source-path }}\dist\**\*.zip
+
+      - name: Clean up
+        if: ${{ always() }}
+        run: |
+          ls
+          if (test-path -Path "$pwd\.env") {
+            echo "Remove file($pwd\.env)"
+            remove-item -Path "$pwd\.env" -Force -ErrorAction SilentlyContinue
+          } else {
+            echo "File($pwd\.env) doesn't exist."
+          }
+        working-directory: ${{ env.source-path }}

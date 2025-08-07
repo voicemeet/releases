@@ -1,0 +1,75 @@
+name: Test Web
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        description: "The branch, tag or SHA to checkout. (default to main)"
+        default: "main"
+        required: false
+
+# Declare default permissions as readonly.
+permissions: read-all
+
+env:
+  repository: 'VoiceMeet/voicemeet'
+  main-path: 'main'
+  source-path: 'voicemeet'
+
+jobs:
+  web:
+    name: Create web
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Install dependencies for Linux
+        run: |
+          # https://github.com/getsentry/sentry-dart/issues/2504
+          sudo apt-get update -y && sudo apt-get upgrade -y
+          sudo apt-get install -y curl libcurl4-openssl-dev git unzip xz-utils zip libglu1-mesa
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.32.8'
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Configure .env
+        run: echo "$ENV_STG_BASE64" | base64 --decode > .env
+        env:
+          ENV_STG_BASE64: ${{ secrets.ENV_STG_BASE64 }}
+        working-directory: ${{ env.source-path }}
+
+      - name: Install flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Build flutter
+        run: flutter build web --dart-define-from-file=.env
+        working-directory: ${{ env.source-path }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-artifact
+          path: ./${{ env.source-path }}/build/web
+
+      - name: Clean up
+        if: ${{ always() }}
+        run: |
+          rm -f .env
+        working-directory: ${{ env.source-path }}
