@@ -24,11 +24,11 @@ jobs:
     env:
       Platform: x64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
