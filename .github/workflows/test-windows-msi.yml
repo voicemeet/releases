@@ -26,11 +26,11 @@ jobs:
       version_short: ${{ steps.version_step.outputs.version_short }}
       build_number: ${{ steps.version_step.outputs.build_number }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -63,11 +63,11 @@ jobs:
     needs:
       - get-version
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
