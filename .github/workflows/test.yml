@@ -120,6 +120,12 @@ jobs:
     needs:
       - get-flutter-version
     steps:
+      - name: Select Xcode version
+        run: sudo xcode-select --switch /Applications/Xcode_16.4.app
+
+      - name: print Xcode version
+        run: xcodebuild -version
+
       - uses: actions/checkout@v5
         with:
           path: ${{ env.main-path }}
