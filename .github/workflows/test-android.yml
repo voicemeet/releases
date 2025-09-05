@@ -13,14 +13,44 @@ on:
 permissions: read-all
 
 env:
-  repository: 'VoiceMeet/voicemeet'
+  repository: 'voicemeet/voicemeet'
   main-path: 'main'
   source-path: 'voicemeet'
 
 jobs:
+  get-flutter-version:
+    name: Get flutter version
+    runs-on: ubuntu-22.04
+    outputs:
+      flutter_channel: ${{ steps.flutter_version_step.outputs.flutter_channel }}
+      flutter_version: ${{ steps.flutter_version_step.outputs.flutter_version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v5
+        with:
+          repository: ${{ env.repository }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Set flutter version
+        id: flutter_version_step
+        run: |
+          flutter_channel=$(sed -n -E "s/.*flutter-channel:\ '(.*)'/\1/p" .github/workflows/release.yml|head -n1)
+          flutter_version=$(sed -n -E "s/.*flutter-version:\ '(.*)'/\1/p" .github/workflows/release.yml|head -n1)
+          echo "flutter_channel: $flutter_channel, flutter_version: $flutter_version."
+
+          echo "flutter_channel=$flutter_channel" >> $GITHUB_OUTPUT
+          echo "flutter_version=$flutter_version" >> $GITHUB_OUTPUT
+        working-directory: ${{ env.source-path }}
+
   apk:
     name: Create apk
     runs-on: ubuntu-22.04
+    needs:
+      - get-flutter-version
     steps:
       - uses: actions/checkout@v5
         with:
@@ -41,8 +71,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.32.8'
+          channel: ${{ needs.get-flutter-version.outputs.flutter_channel }}
+          flutter-version: ${{ needs.get-flutter-version.outputs.flutter_version }}
 
       - name: Configure .env
         run: echo "$ENV_KEY" | base64 --decode > .env
