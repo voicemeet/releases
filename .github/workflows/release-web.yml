@@ -92,7 +92,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build flutter
-        run: flutter build web --dart-define-from-file=.env --base-href /play/
+        run: flutter build web --dart-define-from-file=.env
         working-directory: ${{ env.source-path }}
 
       - name: Copy files to flutter web
@@ -102,9 +102,11 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.KTY_RELEASE_TOKEN }}
+          external_repository: voicemeet/web.voicemeet.io
+          publish_branch: main
+          personal_token: ${{ secrets.VM_RELEASE_TOKEN }}
           publish_dir: ./${{ env.source-path }}/build/web
-          cname: voicemeet-web.voicemeet.io
+          cname: web.voicemeet.io
 
       - name: Clean up
         if: ${{ always() }}

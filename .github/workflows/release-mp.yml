@@ -1,0 +1,67 @@
+name: Release mp
+run-name: Release mp ${{ github.ref_name }}
+
+on:
+  # Enable manual run
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        description: "The branch, tag or SHA to checkout. (default to main)"
+        default: "main"
+        required: false
+
+# Declare default permissions as readonly.
+permissions: read-all
+
+env:
+  repository: 'voicemeet/frontend-mp'
+  main-path: 'main'
+  source-path: 'mp'
+
+jobs:
+  h5:
+    name: Create web
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v5
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Set node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
+
+      - name: Install deps
+        run: |
+          npm i -g corepack
+          corepack enable
+          pnpm install
+        working-directory: ${{ env.source-path }}
+
+      - name: Build
+        run: pnpm build:h5
+        working-directory: ${{ env.source-path }}
+
+      - name: Copy files to dist
+        run: cp LICENSE README.md ./dist/build/h5
+        working-directory: ${{ env.source-path }}
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          external_repository: voicemeet/mp.voicemeet.io
+          publish_branch: main
+          personal_token: ${{ secrets.VM_RELEASE_TOKEN }}
+          publish_dir: ./${{ env.source-path }}/dist/build/h5
+          cname: mp.voicemeet.io
