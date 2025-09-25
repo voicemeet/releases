@@ -57,6 +57,10 @@ jobs:
         run: cp LICENSE README.md ./apps/web-antd/dist
         working-directory: ${{ env.source-path }}
 
+      - name: Copy index.html to 404.html
+        run: cp ./apps/web-antd/dist/index.html ./apps/web-antd/dist/404.html
+        working-directory: ${{ env.source-path }}
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:

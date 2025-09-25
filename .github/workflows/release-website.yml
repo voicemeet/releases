@@ -57,6 +57,10 @@ jobs:
         run: cp LICENSE README.md ./dist
         working-directory: ${{ env.source-path }}
 
+      - name: Copy index.html to 404.html
+        run: cp ./dist/index.html ./dist/404.html
+        working-directory: ${{ env.source-path }}
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:

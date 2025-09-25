@@ -99,6 +99,10 @@ jobs:
         run: cp LICENSE README.md ./build/web
         working-directory: ${{ env.source-path }}
 
+      - name: Copy index.html to 404.html
+        run: cp ./build/web/index.html ./build/web/404.html
+        working-directory: ${{ env.source-path }}
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
