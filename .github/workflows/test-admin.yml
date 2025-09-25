@@ -1,0 +1,47 @@
+name: Test admin
+
+on:
+  repository_dispatch:
+    types: [ admin-push, admin-pull_request ]
+
+# Declare default permissions as readonly.
+permissions: read-all
+
+env:
+  repository: 'voicemeet/frontend-admin'
+  main-path: 'main'
+  source-path: 'admin'
+
+jobs:
+  admin:
+    name: Create admin
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v5
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Set node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
+
+      - name: Install deps
+        run: |
+          npm i -g corepack
+          corepack enable
+          pnpm install
+        working-directory: ${{ env.source-path }}
+
+      - name: Build
+        run: pnpm build:antd
+        working-directory: ${{ env.source-path }}
