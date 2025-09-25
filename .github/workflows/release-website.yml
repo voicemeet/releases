@@ -21,7 +21,7 @@ env:
 
 jobs:
   website:
-    name: Create web
+    name: Create website
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5

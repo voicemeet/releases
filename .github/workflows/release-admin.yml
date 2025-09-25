@@ -21,7 +21,7 @@ env:
 
 jobs:
   admin:
-    name: Create web
+    name: Create admin
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5

@@ -21,7 +21,7 @@ env:
 
 jobs:
   h5:
-    name: Create web
+    name: Create h5
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5

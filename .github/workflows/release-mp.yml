@@ -21,7 +21,7 @@ env:
 
 jobs:
   mp:
-    name: Create web
+    name: Create mp
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
