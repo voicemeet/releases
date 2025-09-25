@@ -1,5 +1,5 @@
-name: Release mp
-run-name: Release mp ${{ github.ref_name }}
+name: Release admin
+run-name: Release admin ${{ github.ref_name }}
 
 on:
   # Enable manual run
@@ -15,12 +15,12 @@ on:
 permissions: read-all
 
 env:
-  repository: 'voicemeet/frontend-mp'
+  repository: 'voicemeet/frontend-admin'
   main-path: 'main'
-  source-path: 'mp'
+  source-path: 'admin'
 
 jobs:
-  mp:
+  admin:
     name: Create web
     runs-on: ubuntu-22.04
     steps:
@@ -38,7 +38,7 @@ jobs:
       - name: Set node
         uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 20
           registry-url: https://registry.npmjs.org/
           package-manager-cache: false
 
@@ -50,18 +50,18 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build
-        run: pnpm build:h5
+        run: pnpm build:antd
         working-directory: ${{ env.source-path }}
 
       - name: Copy files to dist
-        run: cp LICENSE README.md ./dist/build/h5
+        run: cp LICENSE README.md ./apps/web-antd/dist
         working-directory: ${{ env.source-path }}
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
-          external_repository: voicemeet/mp.voicemeet.io
+          external_repository: voicemeet/admin.voicemeet.io
           publish_branch: main
           personal_token: ${{ secrets.VM_RELEASE_TOKEN }}
-          publish_dir: ./${{ env.source-path }}/dist/build/h5
-          cname: mp.voicemeet.io
+          publish_dir: ./${{ env.source-path }}/apps/web-antd/dist
+          cname: admin.voicemeet.io
