@@ -2,7 +2,7 @@ name: Test (PR)
 
 on:
   repository_dispatch:
-    types: [ code-pull_request ]
+    types: [ web-pull_request ]
 
 # Declare default permissions as readonly.
 permissions: read-all

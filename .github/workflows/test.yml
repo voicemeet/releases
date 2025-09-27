@@ -2,7 +2,7 @@ name: Test
 
 on:
   repository_dispatch:
-    types: [ code-push ]
+    types: [ web-push ]
 
 # Declare default permissions as readonly.
 permissions: read-all
