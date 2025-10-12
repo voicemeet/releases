@@ -346,7 +346,7 @@ jobs:
 
   windows:
     name: Create windows
-    runs-on: windows-2022
+    runs-on: windows-2025
     needs:
       - get-flutter-version
     steps:

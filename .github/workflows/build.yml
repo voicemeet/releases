@@ -992,7 +992,7 @@ jobs:
 
   windows-exe:
     name: Create windows exe
-    runs-on: windows-2022
+    runs-on: windows-2025
     env:
       Platform: x64
     needs:
@@ -1039,9 +1039,7 @@ jobs:
 
       - name: Install yq
         shell: pwsh
-        run: |
-          choco install yq
-          yq --version
+        run: choco install yq --no-progress
 
       - name: Update config
         shell: pwsh
@@ -1128,7 +1126,7 @@ jobs:
 
   windows-msi:
     name: Create windows msi
-    runs-on: windows-2022
+    runs-on: windows-2025
     env:
       Platform: x64
       Configuration: Release
@@ -1156,9 +1154,7 @@ jobs:
 
       - name: Install yq
         shell: pwsh
-        run: |
-          choco install yq
-          yq --version
+        run: choco install yq --no-progress
 
       - name: Install wix toolset
         shell: pwsh
@@ -1178,12 +1174,6 @@ jobs:
       - name: copy eula.rtf to the windows folder
         run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
         working-directory: ${{ env.source-path }}
-
-      - name: Install yq
-        shell: pwsh
-        run: |
-          choco install yq
-          yq --version
 
       - name: Install flutter dependencies
         run: flutter pub get
@@ -1270,7 +1260,7 @@ jobs:
 
   windows-store:
     name: Create windows store
-    runs-on: windows-2022
+    runs-on: windows-2025
     env:
       Platform: x64
     needs:
@@ -1309,9 +1299,7 @@ jobs:
 
       - name: Install yq
         shell: pwsh
-        run: |
-          choco install yq
-          yq --version
+        run: choco install yq --no-progress
 
       - name: Update config
         shell: pwsh
@@ -1405,7 +1393,7 @@ jobs:
 
   windows-zip:
     name: Create windows zip
-    runs-on: windows-2022
+    runs-on: windows-2025
     env:
       Platform: x64
     needs:

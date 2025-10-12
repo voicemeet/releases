@@ -48,7 +48,7 @@ jobs:
 
   windows-exe:
     name: Create exe
-    runs-on: windows-2022
+    runs-on: windows-2025
     needs:
       - get-flutter-version
     env:
@@ -87,6 +87,9 @@ jobs:
         run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
         working-directory: ${{ env.source-path }}
 
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress
+
       - name: Copy ChineseSimplified.isl to C:\Program Files (x86)\Inno Setup 6\Languages\
         run: |
           copy-item -Path windows\Languages\Unofficial\*.isl -Destination 'C:\Program Files (x86)\Inno Setup 6\Languages\'
@@ -97,9 +100,7 @@ jobs:
 
       - name: Install yq
         shell: pwsh
-        run: |
-          choco install yq
-          yq --version
+        run: choco install yq --no-progress
 
       - name: Update config
         shell: pwsh
