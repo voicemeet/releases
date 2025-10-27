@@ -142,7 +142,7 @@ jobs:
           DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY }}
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: unsigned-pkg-artifact
           path: ./VoiceMeet-unsigned.pkg
@@ -156,7 +156,7 @@ jobs:
           ' distribution.dist
         working-directory: ${{ env.source-path }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: distribution-artifact
           path: ./${{ env.source-path }}/distribution.dist
@@ -169,7 +169,7 @@ jobs:
           DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY }}
         working-directory: ${{ env.source-path }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: pkg-artifact
           path: ./${{ env.source-path }}/VoiceMeet.pkg
@@ -228,7 +228,7 @@ jobs:
           BUILD_NUMBER: ${{ steps.version_step.outputs.build_number }}
         working-directory: ${{ env.source-path }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: stapled-pkg-artifact
           path: ./${{ env.source-path }}/*.pkg
