@@ -25,11 +25,11 @@ jobs:
       flutter_channel: ${{ steps.flutter_version_step.outputs.flutter_channel }}
       flutter_version: ${{ steps.flutter_version_step.outputs.flutter_version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -54,11 +54,11 @@ jobs:
     env:
       Platform: x64
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}

@@ -44,11 +44,11 @@ jobs:
       release: ${{ steps.version_step.outputs.release }}
       tag_name: ${{ steps.version_step.outputs.tag_name }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -142,7 +142,7 @@ jobs:
       - windows-store
       - windows-zip
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
@@ -167,11 +167,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -263,11 +263,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -367,11 +367,11 @@ jobs:
       - name: print Xcode version
         run: xcodebuild -version
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -487,11 +487,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -620,11 +620,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -779,11 +779,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -928,11 +928,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -1073,11 +1073,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -1212,11 +1212,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -1344,11 +1344,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
@@ -1477,11 +1477,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
