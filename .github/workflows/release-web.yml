@@ -106,8 +106,8 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
-          external_repository: ${{ env.repository }}
-#          publish_branch: main
+          external_repository: voicemeet/web.voicemeet.io
+          publish_branch: main
           personal_token: ${{ secrets.VM_RELEASE_TOKEN }}
           publish_dir: ./${{ env.source-path }}/build/web
           cname: web.voicemeet.io
