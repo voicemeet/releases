@@ -173,7 +173,7 @@ jobs:
           BUILD_NUMBER: ${{ needs.get-version.outputs.build_number }}
         working-directory: ${{ env.source-path }}
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: windows-msi-artifact
           path: .\${{ env.source-path }}\msi\voicemeet\bin\${{ env.Platform }}\${{ env.Configuration }}\*\*.msi

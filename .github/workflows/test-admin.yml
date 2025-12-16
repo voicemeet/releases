@@ -50,7 +50,7 @@ jobs:
         run: cp ./apps/web-antd/dist/index.html ./apps/web-antd/dist/404.html
         working-directory: ${{ env.source-path }}
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: admin-artifact
           path: ./${{ env.source-path }}/apps/web-antd/dist
