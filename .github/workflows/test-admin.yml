@@ -45,3 +45,12 @@ jobs:
       - name: Build
         run: pnpm build:antd
         working-directory: ${{ env.source-path }}
+
+      - name: Copy index.html to 404.html
+        run: cp ./apps/web-antd/dist/index.html ./apps/web-antd/dist/404.html
+        working-directory: ${{ env.source-path }}
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: admin-artifact
+          path: ./${{ env.source-path }}/apps/web-antd/dist

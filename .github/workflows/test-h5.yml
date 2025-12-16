@@ -45,3 +45,12 @@ jobs:
       - name: Build
         run: pnpm build:pro
         working-directory: ${{ env.source-path }}
+
+      - name: Copy index.html to 404.html
+        run: cp ./dist/index.html ./dist/404.html
+        working-directory: ${{ env.source-path }}
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: h5-artifact
+          path: ./${{ env.source-path }}/dist
