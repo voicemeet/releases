@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 # Declare default permissions as readonly.
-permissions: read-all
+permissions: write-all
 
 env:
   repository: 'voicemeet/voicemeet'
@@ -95,7 +95,7 @@ jobs:
           SHA: ${{ steps.sha_step.outputs.sha }}
           TAG_NAME: ${{ steps.version_step.outputs.tag_name }}
           nightly_date: ${{ steps.version_step.outputs.nightly_date }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
   publish:
@@ -125,7 +125,7 @@ jobs:
         env:
           SHA: ${{ needs.create-release.outputs.sha }}
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
   apk:
@@ -201,7 +201,7 @@ jobs:
         run: gh release upload "$TAG_NAME" ./*.apk
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -285,7 +285,7 @@ jobs:
         run: gh release upload "$TAG_NAME" ./*.aab
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -400,7 +400,7 @@ jobs:
         run: gh release upload "$TAG_NAME" ./*.ipa
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -532,7 +532,7 @@ jobs:
         run: gh release upload "$TAG_NAME" ./*.dmg
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -689,7 +689,7 @@ jobs:
         run: gh release upload "$TAG_NAME" ./*.pkg
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -836,7 +836,7 @@ jobs:
         run: gh release upload "$TAG_NAME" ./*.pkg
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -977,7 +977,7 @@ jobs:
         run: gh release upload "$TAG_NAME" ./*.zip
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -1103,7 +1103,7 @@ jobs:
           gh release upload "$env:TAG_NAME" (get-item .\*.exe)
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -1238,7 +1238,7 @@ jobs:
           gh release upload "$env:TAG_NAME" (get-item .\*.msi)
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -1363,7 +1363,7 @@ jobs:
           gh release upload "$env:TAG_NAME" (get-item .\*.msix)
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
@@ -1460,7 +1460,7 @@ jobs:
           gh release upload "$env:TAG_NAME" (get-item .\*.zip)
         env:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.VM_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
       - name: Clean up
