@@ -1029,7 +1029,7 @@ jobs:
         run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
         working-directory: ${{ env.source-path }}
 
-      - name: Copy ChineseSimplified.isl to C:\Program Files (x86)\Inno Setup 6\Languages\
+      - name: Copy Languages to C:\Program Files (x86)\Inno Setup 6\Languages\
         run: copy-item -Path windows\Languages\Unofficial\*.isl -Destination 'C:\Program Files (x86)\Inno Setup 6\Languages\'
         working-directory: ${{ env.source-path }}
 
@@ -1225,8 +1225,15 @@ jobs:
       - name: Copy build for msi
         shell: pwsh
         run: |
-          Rename-Item -Path "$pwd\msi\voicemeet\bin\$env:Platform\$env:Configuration\en-us\voicemeet.msi" -NewName "voicemeet-$env:RELEASE-windows-$env:Platform-en-US.msi"
-          Rename-Item -Path "$pwd\msi\voicemeet\bin\$env:Platform\$env:Configuration\zh-cn\voicemeet.msi" -NewName "voicemeet-$env:RELEASE-windows-$env:Platform-zh-CN.msi"
+          $basePath = ".\msi\voicemeet\bin\$env:Platform\$env:Configuration"
+          
+          Get-ChildItem "$basePath\*\*.msi" | ForEach-Object {
+            if ($_ -match "\\$env:Platform\\$env:Configuration\\([^\\]+)\\([^\\]+)\.msi$") {
+              Rename-Item $_.FullName "$($matches[2])-$env:VERSION_SHORT.$env:BUILD_NUMBER-windows-$env:Platform-$($matches[1]).msi"
+            }
+          }
+          
+          ls -R ".\msi\voicemeet\bin\$env:Platform\$env:Configuration"
           cp ".\msi\voicemeet\bin\$env:Platform\$env:Configuration\*\*.msi" "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}

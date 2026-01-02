@@ -166,8 +166,15 @@ jobs:
       - name: Copy build for msi
         shell: pwsh
         run: |
-          Rename-Item -Path "$pwd\msi\voicemeet\bin\$env:Platform\$env:Configuration\en-us\voicemeet.msi" -NewName "voicemeet-$env:VERSION_SHORT.$env:BUILD_NUMBER-windows-$env:Platform-en-US.msi"
-          Rename-Item -Path "$pwd\msi\voicemeet\bin\$env:Platform\$env:Configuration\zh-cn\voicemeet.msi" -NewName "voicemeet-$env:VERSION_SHORT.$env:BUILD_NUMBER-windows-$env:Platform-zh-CN.msi"
+          $basePath = ".\msi\voicemeet\bin\$env:Platform\$env:Configuration"
+          
+          Get-ChildItem "$basePath\*\*.msi" | ForEach-Object {
+            if ($_ -match "\\$env:Platform\\$env:Configuration\\([^\\]+)\\([^\\]+)\.msi$") {
+              Rename-Item $_.FullName "$($matches[2])-$env:VERSION_SHORT.$env:BUILD_NUMBER-windows-$env:Platform-$($matches[1]).msi"
+            }
+          }
+          
+          ls -R ".\msi\voicemeet\bin\$env:Platform\$env:Configuration"
         env:
           VERSION_SHORT: ${{ needs.get-version.outputs.version_short }}
           BUILD_NUMBER: ${{ needs.get-version.outputs.build_number }}
