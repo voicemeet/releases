@@ -1029,7 +1029,7 @@ jobs:
         run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
         working-directory: ${{ env.source-path }}
 
-      - name: Copy ChineseSimplified.isl to C:\Program Files (x86)\Inno Setup 6\Languages\
+      - name: Copy Languages to C:\Program Files (x86)\Inno Setup 6\Languages\
         run: copy-item -Path windows\Languages\Unofficial\*.isl -Destination 'C:\Program Files (x86)\Inno Setup 6\Languages\'
         working-directory: ${{ env.source-path }}
 
