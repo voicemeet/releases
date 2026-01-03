@@ -179,7 +179,6 @@ jobs:
       - name: Clean up
         if: ${{ always() }}
         run: |
-          ls
           if (test-path -Path "$env:RUNNER_TEMP\voicemeet.pfx") {
             echo "$env:RUNNER_TEMP\voicemeet.pfx"
             remove-item -Path "$env:RUNNER_TEMP\voicemeet.pfx" -Force -ErrorAction SilentlyContinue
