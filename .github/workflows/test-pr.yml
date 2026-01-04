@@ -197,10 +197,6 @@ jobs:
       - name: Flutter doctor -v
         run: flutter doctor -v
 
-      - name: copy eula.rtf to the windows folder
-        run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
-        working-directory: ${{ env.source-path }}
-
       - name: Install fastforge
         run: dart pub global activate fastforge
         working-directory: ${{ env.source-path }}

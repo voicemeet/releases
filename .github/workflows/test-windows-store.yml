@@ -107,10 +107,6 @@ jobs:
           ENV_KEY: ${{ secrets.ENV_STG_BASE64_WINDOWS }}
         working-directory: ${{ env.source-path }}
 
-      - name: copy eula.rtf to the windows folder
-        run: Copy-Item -Path "$pwd\macos\packaging\base\eula.rtf" -Destination "$pwd\windows\LICENSE.rtf" -Force
-        working-directory: ${{ env.source-path }}
-
       - name: Install yq
         shell: pwsh
         run: choco install yq --no-progress
