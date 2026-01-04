@@ -1084,8 +1084,11 @@ jobs:
           # https://stackoverflow.com/questions/66239147/pfx-encoded-and-back-to-pfx-in-powershell
           $bytes = echo $env:WINDOWS_CERTIFICATE | %{[Convert]::FromBase64String($_)}
           [IO.File]::WriteAllBytes("$certificatePath", $bytes)
+          
           $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
-          & $signtool sign /f "$certificatePath" /fd SHA256 /t http://timestamp.comodoca.com/authenticode /p "$env:WINDOWS_CERTIFICATE_PASSWORD" /n "$env:WINDOWS_PUBLISHER_NAME" (get-item ".\**\*.exe")
+          Get-ChildItem ".\**\*.exe" -Recurse | ForEach-Object {
+            & $signtool sign /f "$certificatePath" /fd SHA256 /t http://timestamp.comodoca.com/authenticode /p "$env:WINDOWS_CERTIFICATE_PASSWORD" /n "$env:WINDOWS_PUBLISHER_NAME" $_.FullName
+          }
         env:
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
@@ -1212,7 +1215,9 @@ jobs:
           msbuild voicemeet.sln -p:Configuration="$env:Configuration" -p:Platform="$env:Platform" /p:TargetVersion=Windows10
 
           $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
-          & $signtool sign /v /f "$certificatePath" /fd SHA256 /t http://timestamp.comodoca.com/authenticode /p "$env:WINDOWS_CERTIFICATE_PASSWORD" /n "$env:WINDOWS_PUBLISHER_NAME" (get-item ".\voicemeet\bin\$env:Platform\$env:Configuration\*\*.msi")
+          Get-ChildItem ".\voicemeet\bin\$env:Platform\$env:Configuration\*\*.msi" -Recurse | ForEach-Object {
+            & $signtool sign /v /f "$certificatePath" /fd SHA256 /t http://timestamp.comodoca.com/authenticode /p "$env:WINDOWS_CERTIFICATE_PASSWORD" /n "$env:WINDOWS_PUBLISHER_NAME" $_.FullName
+          }
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
