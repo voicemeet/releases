@@ -145,7 +145,7 @@ jobs:
       - uses: actions/upload-artifact@v6
         with:
           name: unsigned-pkg-artifact
-          path: ./VoiceMeet-unsigned.pkg
+          path: ./${{ env.source-path }}/VoiceMeet-unsigned.pkg
 
       - name: Building distribution file
         run: |
