@@ -715,14 +715,15 @@ jobs:
           xcrun productbuild --synthesize --product macos/packaging/pkg/requirements --package VoiceMeet-unsigned.pkg distribution.dist
           sed -i '' '2 a\
           \    <title>VoiceMeet</title>\
-          \    <license file="eula.rtf"/>\
+          \    <welcome file="welcome.rtf"/>\
+          \    <license file="license.rtf"/>\
           ' distribution.dist
         working-directory: ${{ env.source-path }}
 
       - name: Sign pkg
         run: |
           # https://www.hexnode.com/mobile-device-management/help/how-to-sign-macos-pkg-files-for-deployment-with-hexnode-mdm/
-          xcrun productbuild --distribution distribution.dist --resources macos/packaging/base --sign "$DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY" VoiceMeet.pkg
+          xcrun productbuild --distribution distribution.dist --resources macos/packaging/pkg/resources --sign "$DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY" VoiceMeet.pkg
         env:
           DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY: ${{ secrets.DEVELOPER_ID_INSTALLER_SIGNING_IDENTITY }}
         working-directory: ${{ env.source-path }}
