@@ -1222,7 +1222,7 @@ jobs:
           
           Get-ChildItem "$basePath\*\*.msi" | ForEach-Object {
             if ($_ -match "\\$env:Platform\\$env:Configuration\\([^\\]+)\\([^\\]+)\.msi$") {
-              Rename-Item $_.FullName "$($matches[2])-$env:VERSION_SHORT.$env:BUILD_NUMBER-windows-$env:Platform-$($matches[1]).msi"
+              Rename-Item $_.FullName "$($matches[2])-$env:RELEASE-windows-$env:Platform-$($matches[1]).msi"
             }
           }
           
