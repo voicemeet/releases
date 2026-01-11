@@ -1066,7 +1066,7 @@ jobs:
             --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
             --platform windows `
             --targets exe `
-            --artifact-name "{{name}}-$env:RELEASE-{{platform}}-setup-$env:Platform.{{ext}}"
+            --artifact-name "VoiceMeetSetup-$env:RELEASE-$env:Platform.{{ext}}"
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -1221,7 +1221,7 @@ jobs:
           
           Get-ChildItem "$basePath\*\*.msi" | ForEach-Object {
             if ($_ -match "\\$env:Platform\\$env:Configuration\\([^\\]+)\\([^\\]+)\.msi$") {
-              Rename-Item $_.FullName "$($matches[2])-$env:RELEASE-windows-$env:Platform-$($matches[1]).msi"
+              Rename-Item $_.FullName "VoiceMeetSetup-$env:RELEASE-$env:Platform-$($matches[1]).msi"
             }
           }
           
@@ -1342,7 +1342,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Create msix
-        run: dart run msix:create --store --build-windows false --output-name "voicemeet-$env:RELEASE-windows-store-$env:Platform"
+        run: dart run msix:create --store --build-windows false --output-name "VoiceMeetStore-$env:RELEASE-$env:Platform"
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
         working-directory: ${{ env.source-path }}
@@ -1433,7 +1433,7 @@ jobs:
             --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
             --platform windows `
             --targets zip `
-            --artifact-name "{{name}}-$env:RELEASE-{{platform}}-portable-$env:Platform.{{ext}}"
+            --artifact-name "VoiceMeetPortable-$env:RELEASE-$env:Platform.{{ext}}"
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
