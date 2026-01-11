@@ -393,7 +393,7 @@ jobs:
             --flutter-build-args "dart-define-from-file=.env" `
             --platform windows `
             --targets zip `
-            --artifact-name '{{name}}-{{build_name}}.{{build_number}}.{{ext}}'
+            --artifact-name 'VoiceMeetPortable-{{build_name}}.{{build_number}}.{{ext}}'
         working-directory: ${{ env.source-path }}
 
       # Package the build.

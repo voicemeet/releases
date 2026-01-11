@@ -223,7 +223,7 @@ jobs:
           echo "VERSION: $VERSION_SHORT.$BUILD_NUMBER"
           ls -la *.pkg
           test -f VoiceMeet-unsigned.pkg && rm -f VoiceMeet-unsigned.pkg
-          mv VoiceMeet.pkg VoiceMeet-"$VERSION_SHORT.$BUILD_NUMBER"-macos-universal.pkg
+          mv VoiceMeet.pkg VoiceMeet-"$VERSION_SHORT.$BUILD_NUMBER"-universal.pkg
         env:
           VERSION_SHORT: ${{ steps.version_step.outputs.version_short }}
           BUILD_NUMBER: ${{ steps.version_step.outputs.build_number }}

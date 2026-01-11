@@ -523,7 +523,7 @@ jobs:
       - name: Build DMG
         run: |
           bash scripts/build-dmg.sh
-          mv VoiceMeet.dmg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-macos-universal.dmg
+          mv VoiceMeet.dmg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-universal.dmg
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
         working-directory: ${{ env.source-path }}
@@ -681,7 +681,7 @@ jobs:
       - name: Copy build for pkg
         run: |
           test -f VoiceMeet-unsigned.pkg && rm -f VoiceMeet-unsigned.pkg
-          mv VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-macos-universal.pkg
+          mv VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-universal.pkg
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
         working-directory: ${{ env.source-path }}
@@ -828,7 +828,7 @@ jobs:
 
       # Package the build.
       - name: Copy build for pkg
-        run: cp VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-macos-appstore-universal.pkg
+        run: cp VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-appstore-universal.pkg
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
@@ -964,14 +964,14 @@ jobs:
           fi
 
       - name: Build zip
-        run: 7z a VoiceMeet-"$RELEASE"-macos-universal.zip ./VoiceMeet.app
+        run: 7z a VoiceMeet-"$RELEASE"-universal.zip ./VoiceMeet.app
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
       # Package the build.
       - name: Copy build for zip
-        run: mv VoiceMeet-*-macos-universal.zip $GITHUB_WORKSPACE/${{ env.main-path }}/
+        run: mv VoiceMeet-*-universal.zip $GITHUB_WORKSPACE/${{ env.main-path }}/
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
 
       - name: Upload assets
@@ -1066,7 +1066,7 @@ jobs:
             --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
             --platform windows `
             --targets exe `
-            --artifact-name "{{name}}-$env:RELEASE-{{platform}}-setup-$env:Platform.{{ext}}"
+            --artifact-name "VoiceMeetSetup-$env:RELEASE-$env:Platform.{{ext}}"
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -1221,7 +1221,7 @@ jobs:
           
           Get-ChildItem "$basePath\*\*.msi" | ForEach-Object {
             if ($_ -match "\\$env:Platform\\$env:Configuration\\([^\\]+)\\([^\\]+)\.msi$") {
-              Rename-Item $_.FullName "$($matches[2])-$env:RELEASE-windows-$env:Platform-$($matches[1]).msi"
+              Rename-Item $_.FullName "VoiceMeetSetup-$env:RELEASE-$env:Platform-$($matches[1]).msi"
             }
           }
           
@@ -1342,7 +1342,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Create msix
-        run: dart run msix:create --store --build-windows false --output-name "voicemeet-$env:RELEASE-windows-store-$env:Platform"
+        run: dart run msix:create --store --build-windows false --output-name "VoiceMeetStore-$env:RELEASE-$env:Platform"
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
         working-directory: ${{ env.source-path }}
@@ -1433,7 +1433,7 @@ jobs:
             --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
             --platform windows `
             --targets zip `
-            --artifact-name "{{name}}-$env:RELEASE-{{platform}}-portable-$env:Platform.{{ext}}"
+            --artifact-name "VoiceMeetPortable-$env:RELEASE-$env:Platform.{{ext}}"
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
