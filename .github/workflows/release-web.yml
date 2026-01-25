@@ -110,7 +110,7 @@ jobs:
 #          publish_branch: main
           personal_token: ${{ secrets.VM_RELEASE_TOKEN }}
           publish_dir: ./${{ env.source-path }}/build/web
-          cname: web.voicemeet.io
+          cname: web.voicemeet.net
 
       - name: Clean up
         if: ${{ always() }}

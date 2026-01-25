@@ -68,4 +68,4 @@ jobs:
 #          publish_branch: main
           personal_token: ${{ secrets.VM_RELEASE_TOKEN }}
           publish_dir: ./${{ env.source-path }}/apps/web-antd/dist
-          cname: admin.voicemeet.io
+          cname: admin.voicemeet.net

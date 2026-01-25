@@ -68,4 +68,4 @@ jobs:
 #          publish_branch: main
           personal_token: ${{ secrets.VM_RELEASE_TOKEN }}
           publish_dir: ./${{ env.source-path }}/dist
-          cname: h5.voicemeet.io
+          cname: h5.voicemeet.net
