@@ -195,7 +195,7 @@ jobs:
           mv *.zip $GITHUB_WORKSPACE/
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: macos-zip-artifact
           path: ./*.zip

@@ -184,7 +184,7 @@ jobs:
           BUILD_NUMBER: ${{ steps.version_step.outputs.build_number }}
         working-directory: ${{ env.source-path }}
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: macos-dmg-artifact
           path: ./${{ env.source-path }}/*.dmg
