@@ -48,7 +48,7 @@ jobs:
 
   macos-zip:
     name: Create macos zip
-    runs-on: macos-15
+    runs-on: macos-26
     needs:
       - get-flutter-version
     steps:
