@@ -229,6 +229,14 @@ jobs:
     needs:
       - get-flutter-version
     steps:
+      - name: Select Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.2'
+
+      - name: print Xcode version
+        run: xcodebuild -version
+
       - uses: actions/checkout@v6
         with:
           path: ${{ env.main-path }}
