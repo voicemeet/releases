@@ -193,7 +193,7 @@ jobs:
         run: |
           echo "VERSION: $VERSION_SHORT.$BUILD_NUMBER"
           ls -la *.pkg
-          mv VoiceMeet.pkg $GITHUB_WORKSPACE/VoiceMeet-"$VERSION_SHORT.$BUILD_NUMBER"-appstore-universal.pkg
+          mv VoiceMeet.pkg $GITHUB_WORKSPACE/VoiceMeet-"$VERSION_SHORT.$BUILD_NUMBER"-macos-appstore-universal.pkg
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           VERSION_SHORT: ${{ steps.version_step.outputs.version_short }}

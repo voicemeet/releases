@@ -181,7 +181,7 @@ jobs:
       - name: Build zip
         run: |
           echo "VERSION: $VERSION_SHORT.$BUILD_NUMBER"
-          7z a VoiceMeet-"$VERSION_SHORT.$BUILD_NUMBER"-universal.zip ./VoiceMeet.app
+          7z a VoiceMeet-"$VERSION_SHORT.$BUILD_NUMBER"-macos-universal.zip ./VoiceMeet.app
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           VERSION_SHORT: ${{ steps.version_step.outputs.version_short }}

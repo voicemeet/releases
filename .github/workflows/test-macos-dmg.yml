@@ -178,7 +178,7 @@ jobs:
         run: |
           echo "VERSION: $VERSION_SHORT.$BUILD_NUMBER"
           ls -la *.dmg
-          mv VoiceMeet.dmg VoiceMeet-"$VERSION_SHORT.$BUILD_NUMBER"-universal.dmg
+          mv VoiceMeet.dmg VoiceMeet-"$VERSION_SHORT.$BUILD_NUMBER"-macos-universal.dmg
         env:
           VERSION_SHORT: ${{ steps.version_step.outputs.version_short }}
           BUILD_NUMBER: ${{ steps.version_step.outputs.build_number }}
