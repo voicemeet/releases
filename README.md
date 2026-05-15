@@ -2,8 +2,8 @@
 
 > Meet the World through Voice.
 
-[![Release](https://github.com/VoiceMeet/releases/actions/workflows/release.yml/badge.svg)](https://github.com/VoiceMeet/releases/actions/workflows/release.yml)
-[![Build](https://github.com/VoiceMeet/releases/actions/workflows/build.yml/badge.svg)](https://github.com/VoiceMeet/releases/actions/workflows/build.yml)
+[![Release](https://github.com/voicemeet/app/actions/workflows/release.yml/badge.svg)](https://github.com/voicemeet/app/actions/workflows/release.yml)
+[![Build](https://github.com/voicemeet/app/actions/workflows/build.yml/badge.svg)](https://github.com/voicemeet/app/actions/workflows/build.yml)
 
 ## License
 
