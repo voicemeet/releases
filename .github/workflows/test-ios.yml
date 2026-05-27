@@ -82,10 +82,6 @@ jobs:
         run: flutter pub get
         working-directory: ${{ env.source-path }}
 
-      - name: Resolving ios dependencies
-        run: pod install --repo-update
-        working-directory: ${{ env.source-path }}/ios
-
       - name: Install the Apple certificate and provisioning profile
         env:
           P12_DEV_BASE64: ${{ secrets.P12_DEV_BASE64 }}
@@ -122,12 +118,6 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           mv $PP_DEV_PATH ~/Library/MobileDevice/Provisioning\ Profiles
           mv $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-
-      - name: Remove build cache
-        run: |
-          echo "╠ Removing build products and intermediate files from the build root..."
-          xcodebuild clean
-        working-directory: ${{ env.source-path }}/ios
 
       - name: Build Ipa
         run: |

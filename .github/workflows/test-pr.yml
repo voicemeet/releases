@@ -111,14 +111,6 @@ jobs:
         run: flutter pub get
         working-directory: ${{ env.source-path }}
 
-      - name: Resolving ios dependencies
-        run: pod install --repo-update
-        working-directory: ${{ env.source-path }}/ios
-
-      - name: Remove build cache
-        run: xcodebuild clean
-        working-directory: ${{ env.source-path }}/ios
-
       - name: Build Ipa
         run: flutter build ipa --no-codesign
         working-directory: ${{ env.source-path }}
@@ -152,14 +144,6 @@ jobs:
       - name: Resolving flutter dependencies
         run: flutter pub get
         working-directory: ${{ env.source-path }}
-
-      - name: Resolving macos dependencies
-        run: pod install --repo-update
-        working-directory: ${{ env.source-path }}/macos
-
-      - name: Remove build cache
-        run: xcodebuild clean
-        working-directory: ${{ env.source-path }}/macos
 
       - name: Build macOS
         run: flutter build macos

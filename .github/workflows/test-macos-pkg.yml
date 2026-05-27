@@ -82,16 +82,6 @@ jobs:
         run: flutter pub get
         working-directory: ${{ env.source-path }}
 
-      - name: Resolving macos dependencies
-        run: pod install --repo-update
-        working-directory: ${{ env.source-path }}/macos
-
-      - name: Remove build cache
-        run: |
-          echo "╠ Removing build products and intermediate files from the build root..."
-          xcodebuild clean
-        working-directory: ${{ env.source-path }}/macos
-
       - name: Build macOS
         run: |
           echo "╠ Releasing to app store..."

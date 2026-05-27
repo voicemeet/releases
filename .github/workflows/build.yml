@@ -331,10 +331,6 @@ jobs:
         run: flutter pub get
         working-directory: ${{ env.source-path }}
 
-      - name: Resolving ios dependencies
-        run: pod install --repo-update
-        working-directory: ${{ env.source-path }}/ios
-
       - name: Install the Apple certificate and provisioning profile
         env:
           P12_DEV_BASE64: ${{ secrets.P12_DEV_BASE64 }}
@@ -371,10 +367,6 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           mv $PP_DEV_PATH ~/Library/MobileDevice/Provisioning\ Profiles
           mv $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-
-      - name: Remove build cache
-        run: xcodebuild clean
-        working-directory: ${{ env.source-path }}/ios
 
       - name: Build ipa
         run: flutter build ipa --dart-define-from-file=.env --export-options-plist=ios/ExportOptions/debug.plist --build-name=$VERSION --build-number $BUILD_NUMBER
@@ -442,14 +434,6 @@ jobs:
       - name: Resolving flutter dependencies
         run: flutter pub get
         working-directory: ${{ env.source-path }}
-
-      - name: Resolving macos dependencies
-        run: pod install --repo-update
-        working-directory: ${{ env.source-path }}/macos
-
-      - name: Remove build cache
-        run: xcodebuild clean
-        working-directory: ${{ env.source-path }}/macos
 
       - name: Build macOS
         run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER
@@ -573,14 +557,6 @@ jobs:
       - name: Resolving flutter dependencies
         run: flutter pub get
         working-directory: ${{ env.source-path }}
-
-      - name: Resolving macos dependencies
-        run: pod install --repo-update
-        working-directory: ${{ env.source-path }}/macos
-
-      - name: Remove build cache
-        run: xcodebuild clean
-        working-directory: ${{ env.source-path }}/macos
 
       - name: Build macOS
         run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER
@@ -732,14 +708,6 @@ jobs:
         run: flutter pub get
         working-directory: ${{ env.source-path }}
 
-      - name: Resolving macos dependencies
-        run: pod install --repo-update
-        working-directory: ${{ env.source-path }}/macos
-
-      - name: Remove build cache
-        run: xcodebuild clean
-        working-directory: ${{ env.source-path }}/macos
-
       - name: Build macOS
         run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER
         env:
@@ -878,14 +846,6 @@ jobs:
       - name: Resolving flutter dependencies
         run: flutter pub get
         working-directory: ${{ env.source-path }}
-
-      - name: Resolving macos dependencies
-        run: pod install --repo-update
-        working-directory: ${{ env.source-path }}/macos
-
-      - name: Remove build cache
-        run: xcodebuild clean
-        working-directory: ${{ env.source-path }}/macos
 
       - name: Build macOS
         run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER
