@@ -1260,51 +1260,55 @@ jobs:
           # $bytes = echo $env:WINDOWS_CERTIFICATE | %{[Convert]::FromBase64String($_)}
           # [IO.File]::WriteAllBytes("$certificatePath", $bytes)
 
-          $yamlFile = ".\pubspec.yaml"
+          $yamlFile = ".\windows\packaging\msix\make_config.yaml"
           $yamlContent = Get-Content -Raw -Path $yamlFile
 
           # 获取环境变量的值
+          $isStore = (Get-Item -Path Env:WINDOWS_STORE).Value
           $identityName = (Get-Item -Path Env:WINDOWS_IDENTITY_NAME).Value
           $publisher = (Get-Item -Path Env:WINDOWS_PUBLISHER).Value
           $publisherName = (Get-Item -Path Env:WINDOWS_PUBLISHER_NAME).Value
-          # $certificatePassword = (Get-Item -Path Env:WINDOWS_CERTIFICATE_PASSWORD).Value
 
           # 使用 yq 更新多个字段
-          $updatedYamlContent = echo $yamlContent | yq e ".msix_config.identity_name = `"$identityName`" | .msix_config.publisher = `"$publisher`" | .msix_config.publisher_display_name = `"$publisherName`" | del(.msix_config.certificate_path) | del(.msix_config.certificate_password)" -
+          $updatedYamlContent = echo $yamlContent | yq e ".store = `"$isStore`" | .identity_name = `"$identityName`" | .publisher = `"$publisher`" | .publisher_display_name = `"$publisherName`" | del(.certificate_path) | del(.certificate_password)" -
 
           # 将更新后的内容写回文件
           Set-Content -Path $yamlFile -Value $updatedYamlContent
         env:
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+          WINDOWS_STORE: true
           WINDOWS_IDENTITY_NAME: ${{ secrets.WINDOWS_IDENTITY_NAME }}
           WINDOWS_PUBLISHER: ${{ secrets.WINDOWS_PUBLISHER }}
           WINDOWS_PUBLISHER_NAME: ${{ secrets.WINDOWS_PUBLISHER_NAME }}
         working-directory: ${{ env.source-path }}
 
+      - name: Install fastforge
+        run: dart pub global activate fastforge
+
       - name: Install flutter dependencies
         run: flutter pub get
         working-directory: ${{ env.source-path }}
 
-      - name: Build windows
+      - name: Build msix
         run: |
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
-          flutter build windows --dart-define-from-file=.env --build-name=$env:VERSION --build-number $env:BUILD_NUMBER
+          fastforge package `
+            --skip-clean `
+            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
+            --platform windows `
+            --targets msix `
+            --artifact-name "{{name}}-$env:RELEASE-{{platform}}-$env:Platform.{{ext}}"
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
-        working-directory: ${{ env.source-path }}
-
-      - name: Create msix
-        run: dart run msix:create --store --build-windows false --output-name "voicemeet-$env:RELEASE-windows-store-$env:Platform"
-        env:
           RELEASE: ${{ needs.create-release.outputs.release }}
         working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for msix
-        run: cp .\*.msix "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
-        working-directory: ${{ env.source-path }}\build\windows\${{ env.Platform }}\runner\Release
+        run: cp .\dist\**\*.msix "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+        working-directory: ${{ env.source-path }}
 
       - name: Upload assets
         run: |
