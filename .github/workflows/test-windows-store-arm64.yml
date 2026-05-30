@@ -1,0 +1,138 @@
+name: Test Windows store (arm64)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        description: "The branch, tag or SHA to checkout. (default to main)"
+        default: "main"
+        required: false
+
+# Declare default permissions as readonly.
+permissions: read-all
+
+env:
+  repository: 'voicemeet/voicemeet'
+  main-path: 'main'
+  source-path: 'voicemeet'
+
+jobs:
+  windows-store:
+    name: Create windows store
+    runs-on: windows-11-arm
+    env:
+      Platform: arm64
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: ${{ env.main-path }}
+
+      - uses: actions/checkout@v6
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ github.event.inputs.ref }}
+          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          path: ${{ env.source-path }}
+
+      - name: Setup Flutter
+        shell: pwsh
+        run: .\scripts\install-flutter-github-actions.ps1
+        working-directory: ${{ env.source-path }}
+
+      - name: Download a fresh binary instead of using the stamped x64 version
+        shell: pwsh
+        run: |
+          Remove-Item -Path "$env:FLUTTER_ROOT\flutter\bin\cache\engine-dart-sdk.stamp" -Force -ErrorAction SilentlyContinue
+          dart --version
+          flutter precache --windows
+
+      - name: Flutter doctor -v
+        run: flutter doctor -v
+
+      - name: Configure .env
+        run: |
+          echo "$pwd"
+          $bytes = echo $env:ENV_KEY | %{[Convert]::FromBase64String($_)}
+          [IO.File]::WriteAllBytes("$pwd\.env", $bytes)
+        env:
+          ENV_KEY: ${{ secrets.ENV_STG_BASE64_WINDOWS }}
+        working-directory: ${{ env.source-path }}
+
+      - name: Install yq
+        shell: pwsh
+        run: choco install yq --no-progress
+
+      - name: Update config
+        shell: pwsh
+        run: |
+          echo $env:RUNNER_TEMP
+          # https://stackoverflow.com/questions/15414678/how-to-decode-a-base64-string
+          # https://stackoverflow.com/questions/66239147/pfx-encoded-and-back-to-pfx-in-powershell
+          $env:certificatePath = "$env:RUNNER_TEMP\voicemeet.pfx"
+          $bytes = echo $env:WINDOWS_CERTIFICATE | %{[Convert]::FromBase64String($_)}
+          [IO.File]::WriteAllBytes("$env:certificatePath", $bytes)
+          
+          $certificatePassword = (Get-Item -Path Env:WINDOWS_CERTIFICATE_PASSWORD).Value
+
+          $yamlFile = ".\windows\packaging\msix\make_config.yaml"
+          $yamlContent = Get-Content -Raw -Path $yamlFile
+
+          # 获取环境变量的值
+          $identityName = (Get-Item -Path Env:WINDOWS_IDENTITY_NAME).Value
+          $publisher = (Get-Item -Path Env:WINDOWS_PUBLISHER).Value
+          $publisherName = (Get-Item -Path Env:WINDOWS_PUBLISHER_NAME).Value
+
+          # 使用 yq 更新多个字段
+          $updatedYamlContent = echo $yamlContent | yq e ".architecture = `"$env:Platform`" | .certificate_path = env(certificatePath) | .certificate_password = `"$certificatePassword`" | .identity_name = `"$identityName`" | .publisher = `"$publisher`" | .publisher_display_name = `"$publisherName`"" -
+
+          # 将更新后的内容写回文件
+          Set-Content -Path $yamlFile -Value $updatedYamlContent
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+          WINDOWS_IDENTITY_NAME: ${{ secrets.WINDOWS_IDENTITY_NAME }}
+          WINDOWS_PUBLISHER: ${{ secrets.WINDOWS_PUBLISHER }}
+          WINDOWS_PUBLISHER_NAME: ${{ secrets.WINDOWS_PUBLISHER_NAME }}
+        working-directory: ${{ env.source-path }}
+
+      - name: Install fastforge
+        run: dart pub global activate fastforge
+
+      - name: Install flutter dependencies
+        run: flutter pub get
+        working-directory: ${{ env.source-path }}
+
+      - name: Build msix
+        run: |
+          $env:SENTRY_NATIVE_BACKEND = "breakpad"
+          $env:FLUTTER_WINDOWS_PLATFORM = "$env:Platform"
+          fastforge package `
+            --skip-clean `
+            --flutter-build-args "dart-define-from-file=.env" `
+            --platform windows `
+            --targets msix `
+            --artifact-name "{{name}}-{{build_name}}.{{build_number}}-{{platform}}-$env:Platform.{{ext}}"
+        working-directory: ${{ env.source-path }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-msix-artifact
+          path: .\${{ env.source-path }}\dist\**\*.msix
+
+      - name: Clean up
+        if: ${{ always() }}
+        run: |
+          if (test-path -Path "$env:RUNNER_TEMP\voicemeet.pfx") {
+            echo "$env:RUNNER_TEMP\voicemeet.pfx"
+            remove-item -Path "$env:RUNNER_TEMP\voicemeet.pfx" -Force -ErrorAction SilentlyContinue
+          } else {
+            echo "File($env:RUNNER_TEMP\voicemeet.pfx) doesn't exist."
+          }
+          if (test-path -Path "$pwd\.env") {
+            echo "Remove file($pwd\.env)"
+            remove-item -Path "$pwd\.env" -Force -ErrorAction SilentlyContinue
+          } else {
+            echo "File($pwd\.env) doesn't exist."
+          }
+        working-directory: ${{ env.source-path }}
