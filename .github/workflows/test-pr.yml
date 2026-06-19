@@ -21,11 +21,11 @@ jobs:
       flutter_channel: ${{ steps.flutter_version_step.outputs.flutter_channel }}
       flutter_version: ${{ steps.flutter_version_step.outputs.flutter_version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
@@ -49,11 +49,11 @@ jobs:
     needs:
       - get-flutter-version
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
@@ -88,11 +88,11 @@ jobs:
     needs:
       - get-flutter-version
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
@@ -122,11 +122,11 @@ jobs:
     needs:
       - get-flutter-version
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
@@ -156,11 +156,11 @@ jobs:
     needs:
       - get-flutter-version
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
@@ -196,11 +196,11 @@ jobs:
     needs:
       - get-flutter-version
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
