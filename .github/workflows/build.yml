@@ -27,11 +27,11 @@ jobs:
       release: ${{ steps.version_step.outputs.release }}
       tag_name: ${{ steps.version_step.outputs.tag_name }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -119,7 +119,7 @@ jobs:
       - windows-zip
       - windows-zip-arm64
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
@@ -138,11 +138,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -222,11 +222,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -306,11 +306,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -410,11 +410,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -533,11 +533,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -683,11 +683,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -822,11 +822,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -957,11 +957,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1090,11 +1090,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1243,11 +1243,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1377,11 +1377,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1517,11 +1517,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1649,11 +1649,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1788,11 +1788,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1871,11 +1871,11 @@ jobs:
     needs:
       - create-release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: ${{ env.main-path }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: ${{ env.repository }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
