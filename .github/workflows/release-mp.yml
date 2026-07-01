@@ -32,7 +32,7 @@ jobs:
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
-          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          token: ${{ secrets.VM_APP_TOKEN }}
           path: ${{ env.source-path }}
 
       - name: Set node
@@ -66,6 +66,6 @@ jobs:
         with:
           external_repository: ${{ env.repository }}
 #          publish_branch: main
-          personal_token: ${{ secrets.VM_RELEASE_TOKEN }}
+          personal_token: ${{ secrets.VM_APP_TOKEN }}
           publish_dir: ./${{ env.source-path }}/dist/build/h5
           cname: mp.voicemeet.net

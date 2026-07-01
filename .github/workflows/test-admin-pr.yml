@@ -1,21 +1,21 @@
-name: Test h5
-run-name: ${{ github.event.client_payload.commit_message }}
+name: Test admin
+run-name: ${{ github.event.client_payload.pr_title }}(#${{ github.event.client_payload.pr_number }})
 
 on:
   repository_dispatch:
-    types: [ h5-push ]
+    types: [ admin-pull_request ]
 
 # Declare default permissions as readonly.
 permissions: read-all
 
 env:
-  repository: 'voicemeet/frontend-h5'
+  repository: 'voicemeet/frontend-admin'
   main-path: 'main'
-  source-path: 'h5'
+  source-path: 'admin'
 
 jobs:
-  h5:
-    name: Create h5
+  admin:
+    name: Create admin
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
@@ -44,14 +44,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build
-        run: pnpm build:pro
+        run: pnpm build:antd
         working-directory: ${{ env.source-path }}
 
       - name: Copy index.html to 404.html
-        run: cp ./dist/index.html ./dist/404.html
+        run: cp ./apps/web-antd/dist/index.html ./apps/web-antd/dist/404.html
         working-directory: ${{ env.source-path }}
 
       - uses: actions/upload-artifact@v7
         with:
-          name: h5-artifact
-          path: ./${{ env.source-path }}/dist
+          name: admin-artifact
+          path: ./${{ env.source-path }}/apps/web-antd/dist

@@ -1,21 +1,21 @@
-name: Test h5
-run-name: ${{ github.event.client_payload.commit_message }}
+name: Test mp (PR)
+run-name: ${{ github.event.client_payload.pr_title }}(#${{ github.event.client_payload.pr_number }})
 
 on:
   repository_dispatch:
-    types: [ h5-push ]
+    types: [ mp-pull_request ]
 
 # Declare default permissions as readonly.
 permissions: read-all
 
 env:
-  repository: 'voicemeet/frontend-h5'
+  repository: 'voicemeet/frontend-mp'
   main-path: 'main'
-  source-path: 'h5'
+  source-path: 'mp'
 
 jobs:
-  h5:
-    name: Create h5
+  mp:
+    name: Create mp
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
@@ -32,7 +32,7 @@ jobs:
       - name: Set node
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org/
           package-manager-cache: false
 
@@ -44,14 +44,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build
-        run: pnpm build:pro
+        run: pnpm build:h5
         working-directory: ${{ env.source-path }}
 
       - name: Copy index.html to 404.html
-        run: cp ./dist/index.html ./dist/404.html
+        run: cp ./dist/build/h5/index.html ./dist/build/h5/404.html
         working-directory: ${{ env.source-path }}
 
       - uses: actions/upload-artifact@v7
         with:
-          name: h5-artifact
-          path: ./${{ env.source-path }}/dist
+          name: mp-artifact
+          path: ./${{ env.source-path }}/dist/build/h5

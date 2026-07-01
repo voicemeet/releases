@@ -1,9 +1,9 @@
-name: Test h5
-run-name: ${{ github.event.client_payload.commit_message }}
+name: Test h5 (PR)
+run-name: ${{ github.event.client_payload.pr_title }}(#${{ github.event.client_payload.pr_number }})
 
 on:
   repository_dispatch:
-    types: [ h5-push ]
+    types: [ h5-pull_request ]
 
 # Declare default permissions as readonly.
 permissions: read-all

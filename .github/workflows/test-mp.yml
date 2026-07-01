@@ -1,8 +1,9 @@
 name: Test mp
+run-name: ${{ github.event.client_payload.commit_message }}
 
 on:
   repository_dispatch:
-    types: [ mp-push, mp-pull_request ]
+    types: [ mp-push ]
 
 # Declare default permissions as readonly.
 permissions: read-all
@@ -25,7 +26,7 @@ jobs:
         with:
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
-          token: ${{ secrets.VM_RELEASE_TOKEN }}
+          token: ${{ secrets.VM_APP_TOKEN }}
           path: ${{ env.source-path }}
 
       - name: Set node
