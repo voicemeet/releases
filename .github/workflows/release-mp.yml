@@ -45,7 +45,7 @@ jobs:
       - name: Install deps
         run: |
           npm i -g corepack
-          corepack enable
+          corepack use pnpm@latest-10
           pnpm install
         working-directory: ${{ env.source-path }}
 

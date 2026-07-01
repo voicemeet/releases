@@ -32,14 +32,14 @@ jobs:
       - name: Set node
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org/
           package-manager-cache: false
 
       - name: Install deps
         run: |
           npm i -g corepack
-          corepack enable
+          corepack use pnpm@latest-10
           pnpm install
         working-directory: ${{ env.source-path }}
 
