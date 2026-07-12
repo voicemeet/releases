@@ -23,7 +23,8 @@ on:
         required: false
 
 # Declare default permissions as readonly.
-permissions: write-all
+permissions:
+  contents: write
 
 env:
   repository: 'voicemeet/voicemeet'
@@ -46,10 +47,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -148,6 +151,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - name: Publish a release
@@ -173,10 +177,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -269,10 +275,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -367,10 +375,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -479,10 +489,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -604,10 +616,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -756,10 +770,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -897,10 +913,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1034,10 +1052,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1172,10 +1192,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1330,10 +1352,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1465,10 +1489,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1606,10 +1632,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1742,10 +1770,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1885,10 +1915,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -1970,10 +2002,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.inputs.ref }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}

@@ -6,7 +6,8 @@ on:
     types: [ web-pull_request ]
 
 # Declare default permissions as readonly.
-permissions: read-all
+permissions:
+  contents: read
 
 env:
   repository: 'voicemeet/voicemeet'
@@ -23,10 +24,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -51,10 +54,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -90,10 +95,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -124,10 +131,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -158,10 +167,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
@@ -198,10 +209,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           path: ${{ env.main-path }}
 
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ${{ env.repository }}
           ref: ${{ github.event.client_payload.sha }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
