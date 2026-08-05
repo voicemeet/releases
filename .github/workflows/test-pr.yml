@@ -1,5 +1,5 @@
 name: Test (PR)
-run-name: ${{ github.event.client_payload.pr_title }}(#${{ github.event.client_payload.pr_number }})
+run-name: ${{ github.event.client_payload.pr_title }} (#${{ github.event.client_payload.pr_number }})
 
 on:
   repository_dispatch:
