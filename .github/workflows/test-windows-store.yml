@@ -38,6 +38,11 @@ jobs:
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
+      - uses: actions/setup-java@v5
+        with:
+          java-version: "17.x"
+          distribution: 'temurin'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
