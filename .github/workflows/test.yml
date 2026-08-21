@@ -139,11 +139,6 @@ jobs:
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
-      - uses: actions/setup-java@v5
-        with:
-          java-version: "17.x"
-          distribution: 'temurin'
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -238,11 +233,6 @@ jobs:
           ref: ${{ github.event.client_payload.sha }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
-
-      - uses: actions/setup-java@v5
-        with:
-          java-version: "17.x"
-          distribution: 'temurin'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -361,11 +351,6 @@ jobs:
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
 
-      - uses: actions/setup-java@v5
-        with:
-          java-version: "17.x"
-          distribution: 'temurin'
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -435,11 +420,6 @@ jobs:
           ref: ${{ github.event.client_payload.sha }}
           token: ${{ secrets.VM_RELEASE_TOKEN }}
           path: ${{ env.source-path }}
-
-      - uses: actions/setup-java@v5
-        with:
-          java-version: "17.x"
-          distribution: 'temurin'
 
       - name: Install dependencies for Linux
         run: |
