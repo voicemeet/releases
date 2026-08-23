@@ -100,19 +100,13 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build flutter
-        run: flutter build web --dart-define-from-file=.env --obfuscate --split-debug-info=./symbols-directory-web
+        run: flutter build web --dart-define-from-file=.env
         working-directory: ${{ env.source-path }}
 
       - uses: actions/upload-artifact@v7
         with:
           name: web-artifact
           path: ./${{ env.source-path }}/build/web
-
-      - name: Upload symbols
-        uses: actions/upload-artifact@v7
-        with:
-          name: symbols-directory-web
-          path: ./${{ env.source-path }}/symbols-directory-web
 
       - name: Clean up
         if: ${{ always() }}

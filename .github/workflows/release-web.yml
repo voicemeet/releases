@@ -102,7 +102,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build flutter
-        run: flutter build web --dart-define-from-file=.env --obfuscate --split-debug-info=./symbols-directory-web
+        run: flutter build web --dart-define-from-file=.env
         working-directory: ${{ env.source-path }}
 
       - name: Copy files to flutter web
@@ -121,12 +121,6 @@ jobs:
           personal_token: ${{ secrets.VM_RELEASE_TOKEN }}
           publish_dir: ./${{ env.source-path }}/build/web
           cname: web.voicemeet.net
-
-      - name: Upload symbols
-        uses: actions/upload-artifact@v7
-        with:
-          name: symbols-directory-web
-          path: ./${{ env.source-path }}/symbols-directory-web
 
       - name: Clean up
         if: ${{ always() }}

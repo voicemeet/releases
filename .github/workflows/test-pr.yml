@@ -265,11 +265,5 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build flutter
-        run: flutter build web --obfuscate --split-debug-info=./symbols-directory-web
+        run: flutter build web
         working-directory: ${{ env.source-path }}
-
-      - name: Upload symbols
-        uses: actions/upload-artifact@v7
-        with:
-          name: symbols-directory-web
-          path: ./${{ env.source-path }}/symbols-directory-web
