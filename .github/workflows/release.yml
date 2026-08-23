@@ -242,10 +242,11 @@ jobs:
       # Package the build.
       - name: Copy build for Android
         run: |
+          mkdir -p $GITHUB_WORKSPACE/${{ env.main-path }}/apk
           if [[ "$ENV" == "staging" ]]; then
-            cp app-staging-release.apk $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.apk
+            cp app-staging-release.apk $GITHUB_WORKSPACE/${{ env.main-path }}/apk/VoiceMeet-$RELEASE.apk
           else
-            cp app-production-release.apk $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.apk
+            cp app-production-release.apk $GITHUB_WORKSPACE/${{ env.main-path }}/apk/VoiceMeet-$RELEASE.apk
           fi
         working-directory: ${{ env.source-path }}/build/app/outputs/flutter-apk
         env:
@@ -259,7 +260,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: ./${{ env.main-path }}/*.apk
+          source-dir: ./${{ env.main-path }}/apk
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -353,14 +354,18 @@ jobs:
       # Package the build.
       - name: Copy build for Android
         if: github.event.inputs.env == 'staging'
-        run: cp *.aab $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.aab
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/${{ env.main-path }}/appbundle
+          cp *.aab $GITHUB_WORKSPACE/${{ env.main-path }}/appbundle/VoiceMeet-$RELEASE.aab
         working-directory: ${{ env.source-path }}/build/app/outputs/bundle/stagingRelease
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
       - name: Copy build for Android
         if: github.event.inputs.env == 'production'
-        run: cp *.aab $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.aab
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/${{ env.main-path }}/appbundle
+          cp *.aab $GITHUB_WORKSPACE/${{ env.main-path }}/appbundle/VoiceMeet-$RELEASE.aab
         working-directory: ${{ env.source-path }}/build/app/outputs/bundle/productionRelease
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
@@ -372,7 +377,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: ./${{ env.main-path }}/*.aab
+          source-dir: ./${{ env.main-path }}/appbundle
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -484,7 +489,9 @@ jobs:
 
       # Package the build.
       - name: Copy build for iOS
-        run: cp *.ipa $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-$RELEASE.ipa
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/${{ env.main-path }}/ipa
+          cp *.ipa $GITHUB_WORKSPACE/${{ env.main-path }}/ipa/VoiceMeet-$RELEASE.ipa
         working-directory: ${{ env.source-path }}/build/ios/ipa
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
@@ -496,7 +503,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: ./${{ env.main-path }}/*.ipa
+          source-dir: ./${{ env.main-path }}/ipa
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -625,7 +632,8 @@ jobs:
       - name: Build DMG
         run: |
           bash scripts/build-dmg.sh
-          mv VoiceMeet.dmg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-macos-universal.dmg
+          mkdir -p $GITHUB_WORKSPACE/${{ env.main-path }}/dmg
+          cp VoiceMeet.dmg $GITHUB_WORKSPACE/${{ env.main-path }}/dmg/VoiceMeet-"$RELEASE"-macos-universal.dmg
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
         working-directory: ${{ env.source-path }}
@@ -637,7 +645,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: ./${{ env.main-path }}/*.dmg
+          source-dir: ./${{ env.main-path }}/dmg
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -792,7 +800,8 @@ jobs:
       - name: Copy build for pkg
         run: |
           test -f VoiceMeet-unsigned.pkg && rm -f VoiceMeet-unsigned.pkg
-          mv VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-macos-universal.pkg
+          mkdir -p $GITHUB_WORKSPACE/${{ env.main-path }}/pkg
+          cp VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/pkg/VoiceMeet-"$RELEASE"-macos-universal.pkg
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
         working-directory: ${{ env.source-path }}
@@ -804,7 +813,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: ./${{ env.main-path }}/*.pkg
+          source-dir: ./${{ env.main-path }}/pkg
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -948,7 +957,9 @@ jobs:
 
       # Package the build.
       - name: Copy build for pkg
-        run: cp VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/VoiceMeet-"$RELEASE"-macos-appstore-universal.pkg
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/${{ env.main-path }}/pkg
+          cp VoiceMeet.pkg $GITHUB_WORKSPACE/${{ env.main-path }}/pkg/VoiceMeet-"$RELEASE"-macos-appstore-universal.pkg
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
@@ -960,7 +971,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: ./${{ env.main-path }}/*.pkg
+          source-dir: ./${{ env.main-path }}/pkg
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -1100,7 +1111,9 @@ jobs:
 
       # Package the build.
       - name: Copy build for zip
-        run: mv VoiceMeet-*-macos-universal.zip $GITHUB_WORKSPACE/${{ env.main-path }}/
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/${{ env.main-path }}/zip
+          cp VoiceMeet-*-macos-universal.zip $GITHUB_WORKSPACE/${{ env.main-path }}/zip/
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
 
       - name: Upload assets
@@ -1110,7 +1123,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: ./${{ env.main-path }}/*.zip
+          source-dir: ./${{ env.main-path }}/zip
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -1243,7 +1256,10 @@ jobs:
 
       # Package the build.
       - name: Copy build for exe
-        run: cp .\**\*.exe "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\${{ env.main-path }}\exe"
+          Get-ChildItem -Path . -Filter "*.exe" -Recurse | Copy-Item -Destination "$env:GITHUB_WORKSPACE\${{ env.main-path }}\exe\" -Force
         working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
@@ -1253,7 +1269,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: .\${{ env.main-path }}\*.exe
+          source-dir: .\${{ env.main-path }}\exe
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -1413,7 +1429,10 @@ jobs:
 
       # Package the build.
       - name: Copy build for exe
-        run: cp .\**\*.exe "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\${{ env.main-path }}\exe"
+          Get-ChildItem -Path . -Filter "*.exe" -Recurse | Copy-Item -Destination "$env:GITHUB_WORKSPACE\${{ env.main-path }}\exe\" -Force
         working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
@@ -1423,7 +1442,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: .\${{ env.main-path }}\*.exe
+          source-dir: .\${{ env.main-path }}\exe
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -1559,8 +1578,8 @@ jobs:
             }
           }
           
-          ls -R ".\msi\voicemeet\bin\$env:Platform\$env:Configuration"
-          cp ".\msi\voicemeet\bin\$env:Platform\$env:Configuration\*\*.msi" "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\${{ env.main-path }}\msi"
+          Get-ChildItem -Path "$basePath" -Filter "*.msi" -Recurse | Copy-Item -Destination "$env:GITHUB_WORKSPACE\${{ env.main-path }}\msi\" -Force
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
         working-directory: ${{ env.source-path }}
@@ -1572,7 +1591,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: .\${{ env.main-path }}\*.msi
+          source-dir: .\${{ env.main-path }}\msi
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -1714,8 +1733,8 @@ jobs:
             }
           }
           
-          ls -R ".\msi\voicemeet\bin\$env:Platform\$env:Configuration"
-          cp ".\msi\voicemeet\bin\$env:Platform\$env:Configuration\*\*.msi" "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\${{ env.main-path }}\msi"
+          Get-ChildItem -Path "$basePath" -Filter "*.msi" -Recurse | Copy-Item -Destination "$env:GITHUB_WORKSPACE\${{ env.main-path }}\msi\" -Force
         env:
           RELEASE: ${{ needs.create-release.outputs.release }}
         working-directory: ${{ env.source-path }}
@@ -1727,7 +1746,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: .\${{ env.main-path }}\*.msi
+          source-dir: .\${{ env.main-path }}\msi
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -1858,8 +1877,11 @@ jobs:
 
       # Package the build.
       - name: Copy build for msix
-        run: cp .\dist\**\*.msix "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
-        working-directory: ${{ env.source-path }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\${{ env.main-path }}\msix"
+          Get-ChildItem -Path . -Filter "*.msix" -Recurse | Copy-Item -Destination "$env:GITHUB_WORKSPACE\${{ env.main-path }}\msix\" -Force
+        working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
         uses: ryand56/r2-upload-action@latest
@@ -1868,7 +1890,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: .\${{ env.main-path }}\*.msix
+          source-dir: .\${{ env.main-path }}\msix
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -2014,8 +2036,11 @@ jobs:
 
       # Package the build.
       - name: Copy build for msix
-        run: cp .\dist\**\*.msix "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
-        working-directory: ${{ env.source-path }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\${{ env.main-path }}\msix"
+          Get-ChildItem -Path . -Filter "*.msix" -Recurse | Copy-Item -Destination "$env:GITHUB_WORKSPACE\${{ env.main-path }}\msix\" -Force
+        working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
         uses: ryand56/r2-upload-action@latest
@@ -2024,7 +2049,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: .\${{ env.main-path }}\*.msix
+          source-dir: .\${{ env.main-path }}\msix
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -2126,7 +2151,10 @@ jobs:
 
       # Package the build.
       - name: Copy build for zip
-        run: cp .\**\*.zip "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\${{ env.main-path }}\zip"
+          Get-ChildItem -Path . -Filter "*.zip" -Recurse | Copy-Item -Destination "$env:GITHUB_WORKSPACE\${{ env.main-path }}\zip\" -Force
         working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
@@ -2136,7 +2164,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: .\${{ env.main-path }}\*.zip
+          source-dir: .\${{ env.main-path }}\zip
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
@@ -2231,7 +2259,10 @@ jobs:
 
       # Package the build.
       - name: Copy build for zip
-        run: cp .\**\*.zip "$env:GITHUB_WORKSPACE\${{ env.main-path }}\"
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\${{ env.main-path }}\zip"
+          Get-ChildItem -Path . -Filter "*.zip" -Recurse | Copy-Item -Destination "$env:GITHUB_WORKSPACE\${{ env.main-path }}\zip\" -Force
         working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
@@ -2241,7 +2272,7 @@ jobs:
           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
-          source-dir: .\${{ env.main-path }}\*.zip
+          source-dir: .\${{ env.main-path }}\zip
           destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
