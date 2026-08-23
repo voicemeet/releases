@@ -1,4 +1,4 @@
-name: Test Windows store (arm64)
+name: Test Windows msix
 
 on:
   workflow_dispatch:
@@ -19,11 +19,11 @@ env:
   source-path: 'voicemeet'
 
 jobs:
-  windows-store:
-    name: Create windows store
-    runs-on: windows-11-arm
+  windows-msix:
+    name: Create windows msix
+    runs-on: windows-2025
     env:
-      Platform: arm64
+      Platform: x64
     steps:
       - uses: actions/checkout@v7
         with:
@@ -39,16 +39,10 @@ jobs:
           path: ${{ env.source-path }}
 
       - name: Setup Flutter
-        shell: pwsh
-        run: .\scripts\install-flutter-github-actions.ps1
-        working-directory: ${{ env.source-path }}
-
-      - name: Download a fresh binary instead of using the stamped x64 version
-        shell: pwsh
-        run: |
-          Remove-Item -Path "$env:FLUTTER_ROOT\flutter\bin\cache\engine-dart-sdk.stamp" -Force -ErrorAction SilentlyContinue
-          dart --version
-          flutter precache --windows
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ needs.get-version.outputs.flutter_channel }}
+          flutter-version: ${{ needs.get-version.outputs.flutter_version }}
 
       - name: Flutter doctor -v
         run: flutter doctor -v
@@ -87,7 +81,7 @@ jobs:
           $publisherName = (Get-Item -Path Env:WINDOWS_PUBLISHER_NAME).Value
 
           # 使用 yq 更新多个字段
-          $updatedYamlContent = echo $yamlContent | yq e ".architecture = `"$env:Platform`" | .certificate_path = env(certificatePath) | .certificate_password = `"$certificatePassword`" | .identity_name = `"$identityName`" | .publisher = `"$publisher`" | .publisher_display_name = `"$publisherName`"" -
+          $updatedYamlContent = echo $yamlContent | yq e ".certificate_path = env(certificatePath) | .certificate_password = `"$certificatePassword`" | .identity_name = `"$identityName`" | .publisher = `"$publisher`" | .publisher_display_name = `"$publisherName`"" -
 
           # 将更新后的内容写回文件
           Set-Content -Path $yamlFile -Value $updatedYamlContent
@@ -109,10 +103,9 @@ jobs:
       - name: Build msix
         run: |
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
-          $env:FLUTTER_WINDOWS_PLATFORM = "$env:Platform"
           fastforge package `
             --skip-clean `
-            --flutter-build-args "dart-define-from-file=.env" `
+            --flutter-build-args "dart-define-from-file=.env,obfuscate,split-debug-info=.\symbols-directory-windows-msix" `
             --platform windows `
             --targets msix `
             --artifact-name "{{name}}-{{build_name}}.{{build_number}}-{{platform}}-$env:Platform.{{ext}}"
@@ -122,6 +115,12 @@ jobs:
         with:
           name: windows-msix-artifact
           path: .\${{ env.source-path }}\dist\**\*.msix
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-msix
+          path: .\${{ env.source-path }}\symbols-directory-windows-msix
 
       - name: Clean up
         if: ${{ always() }}

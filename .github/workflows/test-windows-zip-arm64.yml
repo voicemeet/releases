@@ -108,7 +108,7 @@ jobs:
           $env:FLUTTER_WINDOWS_PLATFORM = "$env:Platform"
           fastforge package `
             --skip-clean `
-            --flutter-build-args "dart-define-from-file=.env" `
+            --flutter-build-args "dart-define-from-file=.env,obfuscate,split-debug-info=.\symbols-directory-windows-zip-arm64" `
             --platform windows `
             --targets zip `
             --artifact-name "{{name}}-{{build_name}}.{{build_number}}-{{platform}}-portable-$env:Platform.{{ext}}"
@@ -118,6 +118,12 @@ jobs:
         with:
           name: windows-zip-artifact
           path: .\${{ env.source-path }}\dist\**\*.zip
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-zip-arm64
+          path: .\${{ env.source-path }}\symbols-directory-windows-zip-arm64
 
       - name: Clean up
         if: ${{ always() }}

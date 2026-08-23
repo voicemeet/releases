@@ -84,8 +84,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build Apk
-        run: flutter build apk --debug --no-tree-shake-icons --flavor staging
+        run: flutter build apk --debug --no-tree-shake-icons --flavor staging --obfuscate --split-debug-info=./symbols-directory-apk
         working-directory: ${{ env.source-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-apk
+          path: ./${{ env.source-path }}/symbols-directory-apk
 
   ios:
     name: Create ios
@@ -120,8 +126,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build Ipa
-        run: flutter build ipa --no-codesign
+        run: flutter build ipa --no-codesign --obfuscate --split-debug-info=./symbols-directory-ipa
         working-directory: ${{ env.source-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-ipa
+          path: ./${{ env.source-path }}/symbols-directory-ipa
 
   macos:
     name: Create macos
@@ -156,8 +168,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build macOS
-        run: flutter build macos
+        run: flutter build macos --obfuscate --split-debug-info=./symbols-directory-macos
         working-directory: ${{ env.source-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-macos
+          path: ./${{ env.source-path }}/symbols-directory-macos
 
   windows:
     name: Create windows
@@ -198,8 +216,14 @@ jobs:
       - name: Build flutter
         run: |
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
-          flutter build windows
+          flutter build windows --obfuscate --split-debug-info=.\symbols-directory-windows
         working-directory: ${{ env.source-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows
+          path: .\${{ env.source-path }}\symbols-directory-windows
 
   web:
     name: Create web
@@ -241,5 +265,11 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build flutter
-        run: flutter build web
+        run: flutter build web --obfuscate --split-debug-info=./symbols-directory-web
         working-directory: ${{ env.source-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-web
+          path: ./${{ env.source-path }}/symbols-directory-web

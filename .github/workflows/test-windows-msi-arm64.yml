@@ -134,7 +134,7 @@ jobs:
         run: |
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
           $env:FLUTTER_WINDOWS_PLATFORM = "$env:Platform"
-          flutter build windows --dart-define-from-file=.env
+          flutter build windows --dart-define-from-file=.env --obfuscate --split-debug-info=.\symbols-directory-windows-msi-arm64
         working-directory: ${{ env.source-path }}
 
       - name: Add MSBuild to PATH
@@ -191,6 +191,12 @@ jobs:
         with:
           name: windows-msi-artifact
           path: .\${{ env.source-path }}\msi\voicemeet\bin\${{ env.Platform }}\${{ env.Configuration }}\*\*.msi
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-msi-arm64
+          path: .\${{ env.source-path }}\symbols-directory-windows-msi-arm64
 
       - name: Clean up
         if: ${{ always() }}

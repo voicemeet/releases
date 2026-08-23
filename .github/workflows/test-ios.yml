@@ -49,8 +49,8 @@ jobs:
           echo "flutter_version=$flutter_version" >> $GITHUB_OUTPUT
         working-directory: ${{ env.source-path }}
 
-  ios:
-    name: Create ios
+  ipa:
+    name: Create ipa
     runs-on: macos-26
     needs:
       - get-flutter-version
@@ -127,7 +127,7 @@ jobs:
       - name: Build Ipa
         run: |
           echo "╠ Releasing to app store..."
-          flutter build ipa --dart-define-from-file=.env --export-options-plist=ios/ExportOptions/debug.plist
+          flutter build ipa --dart-define-from-file=.env --obfuscate --split-debug-info=./symbols-directory-ipa --export-options-plist=ios/ExportOptions/debug.plist
         working-directory: ${{ env.source-path }}
 
       - name: Set version
@@ -162,6 +162,12 @@ jobs:
         with:
           name: ios-ipa-artifact
           path: ./*.ipa
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-ipa
+          path: ./${{ env.source-path }}/symbols-directory-ipa
 
       - name: Clean up
         if: ${{ always() }}

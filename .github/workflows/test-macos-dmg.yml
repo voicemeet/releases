@@ -88,7 +88,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build macOS
-        run: flutter build macos --dart-define-from-file=.env
+        run: flutter build macos --dart-define-from-file=.env --obfuscate --split-debug-info=./symbols-directory-macos-dmg
         working-directory: ${{ env.source-path }}
 
       - name: Install certificates
@@ -183,6 +183,12 @@ jobs:
         with:
           name: macos-dmg-artifact
           path: ./${{ env.source-path }}/*.dmg
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-macos-dmg
+          path: ./${{ env.source-path }}/symbols-directory-macos-dmg
 
       - name: Clean up
         if: ${{ always() }}

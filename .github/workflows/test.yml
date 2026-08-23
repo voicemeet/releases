@@ -104,13 +104,19 @@ jobs:
         working-directory: ${{ env.source-path }}/android
 
       - name: Build Apk
-        run: flutter build apk --no-tree-shake-icons --dart-define-from-file=.env --flavor staging
+        run: flutter build apk --no-tree-shake-icons --dart-define-from-file=.env --flavor staging --obfuscate --split-debug-info=./symbols-directory-apk
         working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for Android
         run: ls -la
         working-directory: ${{ env.source-path }}/build/app/outputs/apk/staging/release
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-apk
+          path: ./${{ env.source-path }}/symbols-directory-apk
 
       - name: Clean up
         if: ${{ always() }}
@@ -196,13 +202,19 @@ jobs:
           mv $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Build Ipa
-        run: flutter build ipa --dart-define-from-file=.env --export-options-plist=ios/ExportOptions/debug.plist
+        run: flutter build ipa --dart-define-from-file=.env --obfuscate --split-debug-info=./symbols-directory-ipa --export-options-plist=ios/ExportOptions/debug.plist
         working-directory: ${{ env.source-path }}
 
       # Package the build.
       - name: Copy build for iOS
         run: ls -la
         working-directory: ${{ env.source-path }}/build/ios/ipa
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-ipa
+          path: ./${{ env.source-path }}/symbols-directory-ipa
 
       - name: Clean up
         if: ${{ always() }}
@@ -254,7 +266,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build macOS
-        run: flutter build macos --dart-define-from-file=.env
+        run: flutter build macos --dart-define-from-file=.env --obfuscate --split-debug-info=./symbols-directory-macos
         working-directory: ${{ env.source-path }}
 
       - name: Install certificates
@@ -322,6 +334,12 @@ jobs:
         run: ls -la *.dmg
         working-directory: ${{ env.source-path }}
 
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-macos
+          path: ./${{ env.source-path }}/symbols-directory-macos
+
       - name: Clean up
         if: ${{ always() }}
         run: |
@@ -380,7 +398,7 @@ jobs:
         run: |
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
           fastforge package `
-            --flutter-build-args "dart-define-from-file=.env" `
+            --flutter-build-args "dart-define-from-file=.env,obfuscate,split-debug-info=.\symbols-directory-windows" `
             --platform windows `
             --targets zip `
             --artifact-name '{{name}}-{{build_name}}.{{build_number}}.{{ext}}'
@@ -390,6 +408,12 @@ jobs:
       - name: Copy build for zip
         run: ls -R
         working-directory: ${{ env.source-path }}\dist
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows
+          path: .\${{ env.source-path }}\symbols-directory-windows
 
       - name: Clean up
         if: ${{ always() }}
@@ -448,8 +472,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build flutter
-        run: flutter build web --dart-define-from-file=.env
+        run: flutter build web --dart-define-from-file=.env --obfuscate --split-debug-info=./symbols-directory-web
         working-directory: ${{ env.source-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-web
+          path: ./${{ env.source-path }}/symbols-directory-web
 
       - name: Clean up
         if: ${{ always() }}

@@ -107,18 +107,18 @@ jobs:
     needs:
       - create-release
       - apk
-      - aab
-      - ios
+      - appbundle
+      - ipa
       - macos-dmg
       - macos-pkg
-      - macos-appstore
+      - macos-appstore-pkg
       - macos-zip
       - windows-exe
       - windows-exe-arm64
       - windows-msi
       - windows-msi-arm64
-      - windows-store
-      - windows-store-arm64
+      - windows-msix
+      - windows-msix-arm64
       - windows-zip
       - windows-zip-arm64
     steps:
@@ -194,7 +194,7 @@ jobs:
 
       # Build the application.
       - name: Build apk
-        run: flutter build apk --dart-define-from-file=.env --no-tree-shake-icons --flavor staging --build-name=$VERSION --build-number $BUILD_NUMBER
+        run: flutter build apk --dart-define-from-file=.env --no-tree-shake-icons --flavor staging --build-name=$VERSION --build-number $BUILD_NUMBER --obfuscate --split-debug-info=./symbols-directory-apk
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -214,6 +214,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-apk
+          path: ./${{ env.source-path }}/symbols-directory-apk
+
       - name: Clean up
         if: ${{ always() }}
         run: |
@@ -222,7 +228,7 @@ jobs:
           rm -f .env
         working-directory: ${{ env.source-path }}
 
-  aab:
+  appbundle:
     name: Create appbundle
     runs-on: ubuntu-22.04
     needs:
@@ -280,7 +286,7 @@ jobs:
 
       # Build the application.
       - name: Build appbundle
-        run: flutter build appbundle --dart-define-from-file=.env --no-tree-shake-icons --flavor staging --build-name=$VERSION --build-number $BUILD_NUMBER
+        run: flutter build appbundle --dart-define-from-file=.env --no-tree-shake-icons --flavor staging --build-name=$VERSION --build-number $BUILD_NUMBER --obfuscate --split-debug-info=./symbols-directory-appbundle
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -300,6 +306,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-appbundle
+          path: ./${{ env.source-path }}/symbols-directory-appbundle
+
       - name: Clean up
         if: ${{ always() }}
         run: |
@@ -308,8 +320,8 @@ jobs:
           rm -f .env
         working-directory: ${{ env.source-path }}
 
-  ios:
-    name: Create ios
+  ipa:
+    name: Create ipa
     runs-on: macos-26
     needs:
       - create-release
@@ -383,7 +395,7 @@ jobs:
           mv $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Build ipa
-        run: flutter build ipa --dart-define-from-file=.env --export-options-plist=ios/ExportOptions/debug.plist --build-name=$VERSION --build-number $BUILD_NUMBER
+        run: flutter build ipa --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER --obfuscate --split-debug-info=./symbols-directory-ipa --export-options-plist=ios/ExportOptions/debug.plist
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -402,6 +414,12 @@ jobs:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-ipa
+          path: ./${{ env.source-path }}/symbols-directory-ipa
 
       - name: Clean up
         if: ${{ always() }}
@@ -452,7 +470,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build macOS
-        run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER
+        run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER --obfuscate --split-debug-info=./symbols-directory-macos-dmg
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -529,6 +547,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-macos-dmg
+          path: ./${{ env.source-path }}/symbols-directory-macos-dmg
+
       - name: Clean up
         if: ${{ always() }}
         run: |
@@ -577,7 +601,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build macOS
-        run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER
+        run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER --obfuscate --split-debug-info=./symbols-directory-macos-pkg
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -681,6 +705,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-macos-pkg
+          path: ./${{ env.source-path }}/symbols-directory-macos-pkg
+
       - name: Clean up
         if: ${{ always() }}
         run: |
@@ -691,8 +721,8 @@ jobs:
           rm -f .env
         working-directory: ${{ env.source-path }}
 
-  macos-appstore:
-    name: Create macos appstore
+  macos-appstore-pkg:
+    name: Create macos appstore pkg
     runs-on: macos-26
     needs:
       - create-release
@@ -729,7 +759,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build macOS
-        run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER
+        run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER --obfuscate --split-debug-info=./symbols-directory-macos-appstore-pkg
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -822,6 +852,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-macos-appstore-pkg
+          path: ./${{ env.source-path }}/symbols-directory-macos-appstore-pkg
+
       - name: Clean up
         if: ${{ always() }}
         run: |
@@ -870,7 +906,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build macOS
-        run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER
+        run: flutter build macos --dart-define-from-file=.env --build-name=$VERSION --build-number $BUILD_NUMBER --obfuscate --split-debug-info=./symbols-directory-macos-zip
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -956,6 +992,12 @@ jobs:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-macos-zip
+          path: ./${{ env.source-path }}/symbols-directory-macos-zip
 
       - name: Clean up
         if: ${{ always() }}
@@ -1045,7 +1087,7 @@ jobs:
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
           fastforge package `
             --skip-clean `
-            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
+            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER,obfuscate,split-debug-info=.\symbols-directory-windows-exe" `
             --platform windows `
             --targets exe `
             --artifact-name "{{name}}-$env:RELEASE-{{platform}}-setup-$env:Platform.{{ext}}"
@@ -1083,6 +1125,12 @@ jobs:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-exe
+          path: .\${{ env.source-path }}\symbols-directory-windows-exe
 
       - name: Clean up
         if: ${{ always() }}
@@ -1199,7 +1247,7 @@ jobs:
           $env:FLUTTER_WINDOWS_PLATFORM = "$env:Platform"
           fastforge package `
             --skip-clean `
-            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
+            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER,obfuscate,split-debug-info=.\symbols-directory-windows-exe-arm64" `
             --platform windows `
             --targets exe `
             --artifact-name "{{name}}-$env:RELEASE-{{platform}}-setup-$env:Platform.{{ext}}"
@@ -1237,6 +1285,12 @@ jobs:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-exe-arm64
+          path: .\${{ env.source-path }}\symbols-directory-windows-exe-arm64
 
       - name: Clean up
         if: ${{ always() }}
@@ -1311,7 +1365,7 @@ jobs:
       - name: Build windows
         run: |
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
-          flutter build windows --dart-define-from-file=.env --build-name=$env:VERSION --build-number $env:BUILD_NUMBER
+          flutter build windows --dart-define-from-file=.env --build-name=$env:VERSION --build-number $env:BUILD_NUMBER --obfuscate --split-debug-info=.\symbols-directory-windows-msi
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -1374,6 +1428,12 @@ jobs:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-msi
+          path: .\${{ env.source-path }}\symbols-directory-windows-msi
 
       - name: Clean up
         if: ${{ always() }}
@@ -1454,7 +1514,7 @@ jobs:
         run: |
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
           $env:FLUTTER_WINDOWS_PLATFORM = "$env:Platform"
-          flutter build windows --dart-define-from-file=.env --build-name=$env:VERSION --build-number $env:BUILD_NUMBER
+          flutter build windows --dart-define-from-file=.env --build-name=$env:VERSION --build-number $env:BUILD_NUMBER --obfuscate --split-debug-info=.\symbols-directory-windows-msi-arm64
         env:
           VERSION: ${{ needs.create-release.outputs.version }}
           BUILD_NUMBER: ${{ needs.create-release.outputs.build_number }}
@@ -1518,6 +1578,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
 
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-msi-arm64
+          path: .\${{ env.source-path }}\symbols-directory-windows-msi-arm64
+
       - name: Clean up
         if: ${{ always() }}
         run: |
@@ -1535,8 +1601,8 @@ jobs:
           }
         working-directory: ${{ env.source-path }}
 
-  windows-store:
-    name: Create windows store
+  windows-msix:
+    name: Create windows msix
     runs-on: windows-2025
     env:
       Platform: x64
@@ -1620,7 +1686,7 @@ jobs:
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
           fastforge package `
             --skip-clean `
-            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
+            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER,obfuscate,split-debug-info=.\symbols-directory-windows-msix" `
             --platform windows `
             --targets msix `
             --artifact-name "{{name}}-$env:RELEASE-{{platform}}-$env:Platform.{{ext}}"
@@ -1643,6 +1709,12 @@ jobs:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-msix
+          path: .\${{ env.source-path }}\symbols-directory-windows-msix
 
       - name: Clean up
         if: ${{ always() }}
@@ -1669,8 +1741,8 @@ jobs:
           }
         working-directory: ${{ env.source-path }}
 
-  windows-store-arm64:
-    name: Create windows store (arm64)
+  windows-msix-arm64:
+    name: Create windows msix (arm64)
     runs-on: windows-11-arm
     env:
       Platform: arm64
@@ -1761,7 +1833,7 @@ jobs:
           $env:FLUTTER_WINDOWS_PLATFORM = "$env:Platform"
           fastforge package `
             --skip-clean `
-            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
+            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER,obfuscate,split-debug-info=.\symbols-directory-windows-msix-arm64" `
             --platform windows `
             --targets msix `
             --artifact-name "{{name}}-$env:RELEASE-{{platform}}-$env:Platform.{{ext}}"
@@ -1784,6 +1856,12 @@ jobs:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-msix-arm64
+          path: .\${{ env.source-path }}\symbols-directory-windows-msix-arm64
 
       - name: Clean up
         if: ${{ always() }}
@@ -1860,7 +1938,7 @@ jobs:
           $env:SENTRY_NATIVE_BACKEND = "breakpad"
           fastforge package `
             --skip-clean `
-            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
+            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER,obfuscate,split-debug-info=.\symbols-directory-windows-zip" `
             --platform windows `
             --targets zip `
             --artifact-name "{{name}}-$env:RELEASE-{{platform}}-portable-$env:Platform.{{ext}}"
@@ -1883,6 +1961,12 @@ jobs:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-zip
+          path: .\${{ env.source-path }}\symbols-directory-windows-zip
 
       - name: Clean up
         if: ${{ always() }}
@@ -1952,7 +2036,7 @@ jobs:
           $env:FLUTTER_WINDOWS_PLATFORM = "$env:Platform"
           fastforge package `
             --skip-clean `
-            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER" `
+            --flutter-build-args "dart-define-from-file=.env,build-name=$env:VERSION,build-number=$env:BUILD_NUMBER,obfuscate,split-debug-info=.\symbols-directory-windows-zip-arm64" `
             --platform windows `
             --targets zip `
             --artifact-name "{{name}}-$env:RELEASE-{{platform}}-portable-$env:Platform.{{ext}}"
@@ -1975,6 +2059,12 @@ jobs:
           TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ env.main-path }}
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-zip-arm64
+          path: .\${{ env.source-path }}\symbols-directory-windows-zip-arm64
 
       - name: Clean up
         if: ${{ always() }}

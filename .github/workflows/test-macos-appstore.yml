@@ -49,8 +49,8 @@ jobs:
           echo "flutter_version=$flutter_version" >> $GITHUB_OUTPUT
         working-directory: ${{ env.source-path }}
 
-  macos-appstore:
-    name: Create macos appstore
+  macos-appstore-pkg:
+    name: Create macos appstore pkg
     runs-on: macos-26
     needs:
       - get-flutter-version
@@ -90,7 +90,7 @@ jobs:
       - name: Build macOS
         run: |
           echo "╠ Releasing to mac app store..."
-          flutter build macos --dart-define-from-file=.env
+          flutter build macos --dart-define-from-file=.env --obfuscate --split-debug-info=./symbols-directory-macos-appstore-pkg
         working-directory: ${{ env.source-path }}
 
       - name: Install certificates
@@ -198,6 +198,12 @@ jobs:
         with:
           name: macos-pkg-appstore-artifact
           path: ./*.pkg
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-macos-appstore-pkg
+          path: ./${{ env.source-path }}/symbols-directory-macos-appstore-pkg
 
       - name: Clean up
         if: ${{ always() }}

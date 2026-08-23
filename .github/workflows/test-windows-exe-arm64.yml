@@ -152,7 +152,7 @@ jobs:
           $env:FLUTTER_WINDOWS_PLATFORM = "$env:Platform"
           fastforge package `
             --skip-clean `
-            --flutter-build-args "dart-define-from-file=.env" `
+            --flutter-build-args "dart-define-from-file=.env,obfuscate,split-debug-info=.\symbols-directory-windows-exe-arm64" `
             --platform windows `
             --targets exe `
             --artifact-name "{{name}}-{{build_name}}.{{build_number}}-{{platform}}-setup-$env:Platform.{{ext}}"
@@ -178,6 +178,12 @@ jobs:
         with:
           name: windows-exe-artifact
           path: .\${{ env.source-path }}\dist\**\*.exe
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-windows-exe-arm64
+          path: .\${{ env.source-path }}\symbols-directory-windows-exe-arm64
 
       - name: Clean up
         if: ${{ always() }}

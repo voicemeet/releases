@@ -107,7 +107,7 @@ jobs:
         working-directory: ${{ env.source-path }}/android
 
       - name: Build Apk
-        run: flutter build apk --no-tree-shake-icons --dart-define-from-file=.env --flavor staging
+        run: flutter build apk --no-tree-shake-icons --dart-define-from-file=.env --flavor staging --obfuscate --split-debug-info=./symbols-directory-apk
         working-directory: ${{ env.source-path }}
 
       - name: Set version
@@ -142,6 +142,12 @@ jobs:
         with:
           name: android-apk-artifact
           path: ./*.apk
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-apk
+          path: ./${{ env.source-path }}/symbols-directory-apk
 
       - name: Clean up
         if: ${{ always() }}

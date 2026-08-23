@@ -90,7 +90,7 @@ jobs:
       - name: Build macOS
         run: |
           echo "╠ Releasing to app store..."
-          flutter build macos --dart-define-from-file=.env
+          flutter build macos --dart-define-from-file=.env --obfuscate --split-debug-info=./symbols-directory-macos-pkg
         working-directory: ${{ env.source-path }}
 
       - name: Install certificates
@@ -228,6 +228,12 @@ jobs:
         with:
           name: stapled-pkg-artifact
           path: ./${{ env.source-path }}/*.pkg
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: symbols-directory-macos-pkg
+          path: ./${{ env.source-path }}/symbols-directory-macos-pkg
 
       - name: Clean up
         if: ${{ always() }}
