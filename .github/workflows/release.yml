@@ -253,11 +253,14 @@ jobs:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
       - name: Upload assets
-        run: gh release upload "$TAG_NAME" ./*.apk
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: ./${{ env.main-path }}/*.apk
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -363,11 +366,14 @@ jobs:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
       - name: Upload assets
-        run: gh release upload "$TAG_NAME" ./*.aab
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: ./${{ env.main-path }}/*.aab
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -484,11 +490,14 @@ jobs:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
       - name: Upload assets
-        run: gh release upload "$TAG_NAME" ./*.ipa
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: ./${{ env.main-path }}/*.ipa
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -622,11 +631,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Upload assets
-        run: gh release upload "$TAG_NAME" ./*.dmg
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: ./${{ env.main-path }}/*.dmg
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -786,11 +798,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Upload assets
-        run: gh release upload "$TAG_NAME" ./*.pkg
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: ./${{ env.main-path }}/*.pkg
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -939,11 +954,14 @@ jobs:
           RELEASE: ${{ needs.create-release.outputs.release }}
 
       - name: Upload assets
-        run: gh release upload "$TAG_NAME" ./*.pkg
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: ./${{ env.main-path }}/*.pkg
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -1086,11 +1104,14 @@ jobs:
         working-directory: ${{ env.source-path }}/build/macos/Build/Products/Release
 
       - name: Upload assets
-        run: gh release upload "$TAG_NAME" ./*.zip
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: ./${{ env.main-path }}/*.zip
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -1226,13 +1247,14 @@ jobs:
         working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
-        run: |
-          # https://github.com/cli/cli/issues/5099
-          gh release upload "$env:TAG_NAME" (get-item .\*.exe)
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: .\${{ env.main-path }}\*.exe
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -1395,13 +1417,14 @@ jobs:
         working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
-        run: |
-          # https://github.com/cli/cli/issues/5099
-          gh release upload "$env:TAG_NAME" (get-item .\*.exe)
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: .\${{ env.main-path }}\*.exe
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -1543,13 +1566,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Upload assets
-        run: |
-          # https://github.com/cli/cli/issues/5099
-          gh release upload "$env:TAG_NAME" (get-item .\*.msi)
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: .\${{ env.main-path }}\*.msi
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -1697,13 +1721,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Upload assets
-        run: |
-          # https://github.com/cli/cli/issues/5099
-          gh release upload "$env:TAG_NAME" (get-item .\*.msi)
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: .\${{ env.main-path }}\*.msi
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -1837,13 +1862,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Upload assets
-        run: |
-          # https://github.com/cli/cli/issues/5099
-          gh release upload "$env:TAG_NAME" (get-item .\*.msix)
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: .\${{ env.main-path }}\*.msix
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -1992,13 +2018,14 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Upload assets
-        run: |
-          # https://github.com/cli/cli/issues/5099
-          gh release upload "$env:TAG_NAME" (get-item .\*.msix)
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: .\${{ env.main-path }}\*.msix
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -2103,13 +2130,14 @@ jobs:
         working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
-        run: |
-          # https://github.com/cli/cli/issues/5099
-          gh release upload "$env:TAG_NAME" (get-item .\*.zip)
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: .\${{ env.main-path }}\*.zip
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
@@ -2207,13 +2235,14 @@ jobs:
         working-directory: ${{ env.source-path }}\dist
 
       - name: Upload assets
-        run: |
-          # https://github.com/cli/cli/issues/5099
-          gh release upload "$env:TAG_NAME" (get-item .\*.zip)
-        env:
-          TAG_NAME: ${{ needs.create-release.outputs.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-        working-directory: ${{ env.main-path }}
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_RELEASE_BUCKET }}
+          source-dir: .\${{ env.main-path }}\*.zip
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/
 
       - name: Upload symbols
         uses: ryand56/r2-upload-action@latest
