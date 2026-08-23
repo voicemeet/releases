@@ -260,10 +260,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-apk
-          path: ./${{ env.source-path }}/symbols-directory-apk
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: ./${{ env.source-path }}/symbols-directory-apk
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/apk
 
       - name: Clean up
         if: ${{ always() }}
@@ -366,10 +370,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-appbundle
-          path: ./${{ env.source-path }}/symbols-directory-appbundle
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: ./${{ env.source-path }}/symbols-directory-appbundle
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/appbundle
 
       - name: Clean up
         if: ${{ always() }}
@@ -483,10 +491,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-ipa
-          path: ./${{ env.source-path }}/symbols-directory-ipa
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: ./${{ env.source-path }}/symbols-directory-ipa
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/ipa
 
       - name: Clean up
         if: ${{ always() }}
@@ -617,10 +629,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-macos-dmg
-          path: ./${{ env.source-path }}/symbols-directory-macos-dmg
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: ./${{ env.source-path }}/symbols-directory-macos-dmg
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/macos-dmg
 
       - name: Clean up
         if: ${{ always() }}
@@ -777,10 +793,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-macos-pkg
-          path: ./${{ env.source-path }}/symbols-directory-macos-pkg
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: ./${{ env.source-path }}/symbols-directory-macos-pkg
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/macos-pkg
 
       - name: Clean up
         if: ${{ always() }}
@@ -926,10 +946,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-macos-appstore-pkg
-          path: ./${{ env.source-path }}/symbols-directory-macos-appstore-pkg
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: ./${{ env.source-path }}/symbols-directory-macos-appstore-pkg
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/macos-appstore-pkg
 
       - name: Clean up
         if: ${{ always() }}
@@ -1069,10 +1093,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-macos-zip
-          path: ./${{ env.source-path }}/symbols-directory-macos-zip
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: ./${{ env.source-path }}/symbols-directory-macos-zip
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/macos-zip
 
       - name: Clean up
         if: ${{ always() }}
@@ -1207,10 +1235,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-windows-exe
-          path: .\${{ env.source-path }}\symbols-directory-windows-exe
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: .\${{ env.source-path }}\symbols-directory-windows-exe
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/windows-exe
 
       - name: Clean up
         if: ${{ always() }}
@@ -1372,10 +1404,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-windows-exe-arm64
-          path: .\${{ env.source-path }}\symbols-directory-windows-exe-arm64
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: .\${{ env.source-path }}\symbols-directory-windows-exe-arm64
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/windows-exe-arm64
 
       - name: Clean up
         if: ${{ always() }}
@@ -1516,10 +1552,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-windows-msi
-          path: .\${{ env.source-path }}\symbols-directory-windows-msi
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: .\${{ env.source-path }}\symbols-directory-windows-msi
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/windows-msi
 
       - name: Clean up
         if: ${{ always() }}
@@ -1666,10 +1706,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-windows-msi-arm64
-          path: .\${{ env.source-path }}\symbols-directory-windows-msi-arm64
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: .\${{ env.source-path }}\symbols-directory-windows-msi-arm64
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/windows-msi-arm64
 
       - name: Clean up
         if: ${{ always() }}
@@ -1802,10 +1846,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-windows-msix
-          path: .\${{ env.source-path }}\symbols-directory-windows-msix
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: .\${{ env.source-path }}\symbols-directory-windows-msix
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/windows-msix
 
       - name: Clean up
         if: ${{ always() }}
@@ -1953,10 +2001,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-windows-msix-arm64
-          path: .\${{ env.source-path }}\symbols-directory-windows-msix-arm64
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: .\${{ env.source-path }}\symbols-directory-windows-msix-arm64
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/windows-msix-arm64
 
       - name: Clean up
         if: ${{ always() }}
@@ -2060,10 +2112,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-windows-zip
-          path: .\${{ env.source-path }}\symbols-directory-windows-zip
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: .\${{ env.source-path }}\symbols-directory-windows-zip
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/windows-zip
 
       - name: Clean up
         if: ${{ always() }}
@@ -2160,10 +2216,14 @@ jobs:
         working-directory: ${{ env.main-path }}
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v7
+        uses: ryand56/r2-upload-action@latest
         with:
-          name: symbols-directory-windows-zip-arm64
-          path: .\${{ env.source-path }}\symbols-directory-windows-zip-arm64
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: .\${{ env.source-path }}\symbols-directory-windows-zip-arm64
+          destination-dir: ./${{ needs.create-release.outputs.tag_name }}/windows-zip-arm64
 
       - name: Clean up
         if: ${{ always() }}
