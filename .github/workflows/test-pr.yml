@@ -84,7 +84,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build Apk
-        run: flutter build apk --debug --no-tree-shake-icons --flavor staging --obfuscate --split-debug-info=./symbols-directory-apk
+        run: flutter build apk --no-tree-shake-icons --flavor staging --obfuscate --split-debug-info=./symbols-directory-apk
         working-directory: ${{ env.source-path }}
 
       - name: Upload symbols
