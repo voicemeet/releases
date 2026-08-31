@@ -84,7 +84,7 @@ jobs:
         working-directory: ${{ env.source-path }}
 
       - name: Build Apk
-        run: flutter build apk --no-tree-shake-icons --flavor staging
+        run: flutter build apk --debug --no-tree-shake-icons --flavor staging
         working-directory: ${{ env.source-path }}
 
   ios:
